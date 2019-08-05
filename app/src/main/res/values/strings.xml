@@ -1,0 +1,34 @@
+<resources>
+    <string name="app_name">MapboxApp</string>
+    <string name="access_token" translatable="false">pk.eyJ1IjoiZWRzb25iYXJib3phIiwiYSI6ImNpcDYxM3VkeDAwMGx5b2tvMmlhYms2MGwifQ.wsSAx6beEsmi8FO4hZJ5Vw</string>
+    <string name="user_location_permission_explanation">This app needs location permissions to show its functionality.</string>
+    <string name="user_location_permission_not_granted">You didn\'t grant location permissions.</string>
+    <string name="french">Francês</string>
+    <string name="english">Inglês</string>
+    <string name="spanish">Espanhol</string>
+
+    <string name="was_in_tunnel" translatable="false">was_in_tunnel</string>
+    <string name="was_navigation_stopped" translatable="false">was_navigation_stopped</string>
+    <string name="userPrefs">userPrefs</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="gpsGranted">gpsGranted</string>
+    <string name="serverPrefs">serverPrefs</string>
+    <string name="locationPrefs">locationPrefs</string>
+    <string name="server">server</string>
+    <string name="googleURL">www.google.com</string>
+    <string name="userShared">userShared</string>
+    <string name="partida">Partida</string>
+    <string name="destino">Destino</string>
+    <string name="alertInterrupted">Você está com uma viagem em andamento. Tem certeza que deseja finalizar?</string>
+    <string name="ok">Ok</string>
+    <string name="navigationStatus">navigationStatus</string>
+    <string name="viagemCancelada">Viagem Cancelada</string>
+    <string name="viagemConcluida">Viagem Finalizada</string>
+    <string name="error_address_navigation">Não foi possível iniciar a navegação. Por favor verifique o endereço de destino</string>
+    <string name="distanceTraveled">Km percorrido</string>
+    <string name="resumeTime">Tempo de viagem</string>
+    <string name="motivoCancelamento">motivoCancelamento</string>
+    <string name="chegada">Chegada</string>
+</resources>
