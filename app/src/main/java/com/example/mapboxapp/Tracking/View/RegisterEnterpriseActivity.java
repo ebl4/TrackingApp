@@ -8,8 +8,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 
 import com.example.mapboxapp.R;
+import com.example.mapboxapp.Tracking.Model.Address;
+import com.example.mapboxapp.Tracking.Utils.Util;
+import com.example.mapboxapp.Tracking.Utils.ZipCodeListener;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.List;
@@ -32,13 +36,17 @@ public class RegisterEnterpriseActivity extends AppCompatActivity {
     TextInputLayout inputEstado;
     @BindView(R.id.btnCadastrar)
     Button btnCadastrar;
+    private Util util;
+
+    public static final String VIACEP_URL = "https://viacep.com.br/ws/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register_enterprise);
         ButterKnife.bind(this);
-
+        util = new Util(this, R.id.inputCidade, R.id.inputLogradouro, R.id.inputBairro, R.id.inputEstado);
+        inputCEP.getEditText().addTextChangedListener(new ZipCodeListener(this));
         btnCadastrar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -92,5 +100,28 @@ public class RegisterEnterpriseActivity extends AppCompatActivity {
         startActivity(intent);
         finish();
         //make request
+    }
+
+    private String getZipCode(){
+        return inputCEP.getEditText().getText().toString();
+    }
+
+    public String getUriRequest(){
+        return VIACEP_URL + getZipCode() + "/json/";
+    }
+
+    public void lockFields( boolean isToLock ){
+        util.lockFields( isToLock );
+    }
+
+    public void setAddressFields( Address address){
+        setField( R.id.inputLogradouro, address.getLogradouro() );
+        setField( R.id.inputBairro, address.getBairro() );
+        setField(R.id.inputCidade, address.getLocalidade());
+        setField(R.id.inputEstado, address.getUf());
+    }
+
+    private void setField( int fieldId, String data ){
+        ((TextInputLayout) findViewById( fieldId )).getEditText().setText( data );
     }
 }
