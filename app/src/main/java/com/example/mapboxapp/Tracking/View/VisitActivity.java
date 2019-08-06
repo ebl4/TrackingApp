@@ -55,6 +55,8 @@ public class VisitActivity extends AppCompatActivity {
     TextInputLayout edtPartida;
     @BindView(R.id.edtEndereco)
     TextInputLayout edtDestinoAddress;
+    @BindView(R.id.edtMotivo)
+    TextInputLayout edtMotivo;
     @BindView(R.id.edtDestino)
     AutoCompleteTextView edtDestinoName;
     @BindView(R.id.btnRoute)
@@ -65,9 +67,9 @@ public class VisitActivity extends AppCompatActivity {
     private PreferencesManagerInt prefs;
     private boolean gpsGranted;
 
-    ArrayAdapter<String> adapter;
-    HashMap<String, String> clients;
-    ArrayList<String> clientNames;
+    private ArrayAdapter<String> adapter;
+    private HashMap<String, String> clients;
+    private ArrayList<String> clientNames;
 
     public static GPSCoordinates gpsCoordinates;
     private Intent intent;
@@ -79,14 +81,14 @@ public class VisitActivity extends AppCompatActivity {
         Bundle bundle = getIntent().getExtras();
         ButterKnife.bind(this);
         if(bundle != null){
-            edtDestinoName.setText(bundle.get("cliente").toString());
-            edtDestinoAddress.getEditText().setText(bundle.get("endereco").toString());
+            edtDestinoName.setText(bundle.getString("cliente").toString());
+            edtDestinoAddress.getEditText().setText(bundle.getString("endereco").toString());
         }
         prefs = new PreferencesManager(this);
+        clearPreferences();
         requestPermission();
         gpsGranted = prefs.getBoolean(getString(R.string.gpsGranted), 1);
         clientNames = new ArrayList<String>();
-        clientNames.add("Rua Três Pontas 67 Carlos Prates Belo Horizonte");
         getClients();
         if (gpsGranted) {
             SingleShotLocationProvider.requestSingleUpdate(this, this::setLocation);
@@ -95,7 +97,6 @@ public class VisitActivity extends AppCompatActivity {
                     performRoute();
                 }
             });
-
         } else {
             // GPS nao ativado
             fineLocationExplanation();
@@ -123,6 +124,14 @@ public class VisitActivity extends AppCompatActivity {
         } else {
             prefs.putBoolean(getString(R.string.gpsGranted), true, 1);
         }
+    }
+
+    public void formatMotivo(){
+        prefs.putString(getString(R.string.motivoViagem), edtMotivo.getEditText().getText().toString(), 1);
+    }
+
+    public void clearPreferences(){
+        prefs.clearPreferences(1);
     }
 
     public void getClients(){
@@ -207,10 +216,12 @@ public class VisitActivity extends AppCompatActivity {
     }
 
     public void performRoute() {
+        String motivo = edtMotivo.getEditText().getText().toString();
         if(!edtDestinoAddress.getEditText().getText().toString().isEmpty()) {
             gpsCoordinates.destino = edtDestinoAddress.getEditText().getText().toString();
             if(setDestLocation()) {
                 intent = new Intent(this, TrackingActivity.class);
+                formatMotivo();
                 startActivity(intent);
             }
         } else {

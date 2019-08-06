@@ -16,6 +16,7 @@ import com.example.mapboxapp.R;
 import com.example.mapboxapp.Tracking.Utils.PreferenceConfig;
 import com.example.mapboxapp.Tracking.Utils.TrackingService;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.api.directions.v5.models.DirectionsResponse;
 import com.mapbox.api.directions.v5.models.DirectionsRoute;
@@ -174,8 +175,9 @@ public class TrackingActivity extends AppCompatActivity implements OnNavigationR
         else{
             AlertDialog alertDialog = new AlertDialog.Builder(this).create();
             alertDialog.setMessage(getString(R.string.dropoff_dialog_text));
-            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.error_address_navigation),
+            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.ok),
                     (dialogInterface, in) -> finish());
+            alertDialog.setCanceledOnTouchOutside(false);
             alertDialog.show();
         }
     }
@@ -251,7 +253,7 @@ public class TrackingActivity extends AppCompatActivity implements OnNavigationR
         if(routeProgress.distanceRemaining() < 50){
             fabFinish.setVisibility(View.VISIBLE);
         }
-        Toast.makeText(this, "Distância: " + formatDistance(routeProgress.distanceTraveled()), Toast.LENGTH_SHORT).show();
+        //Snackbar.make(navigationView, "Distância: " + formatDistance(routeProgress.distanceTraveled()), Snackbar.LENGTH_SHORT).show();
     }
 
     public String formatDistance(double distance){

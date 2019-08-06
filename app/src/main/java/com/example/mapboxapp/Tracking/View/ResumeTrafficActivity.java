@@ -8,6 +8,8 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.mapboxapp.R;
+import com.example.mapboxapp.Tracking.Presenter.ResumeTrafficPresenter;
+import com.example.mapboxapp.Tracking.Presenter.ResumeTrafficPresenterInt;
 import com.example.mapboxapp.Tracking.Utils.PreferenceConfig;
 
 import butterknife.BindView;
@@ -28,6 +30,7 @@ public class ResumeTrafficActivity extends AppCompatActivity {
     @BindView(R.id.btnFinalizar)
     Button btnFinalizar;
     PreferenceConfig prefConfig;
+    ResumeTrafficPresenterInt presenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,31 +38,18 @@ public class ResumeTrafficActivity extends AppCompatActivity {
         setContentView(R.layout.activity_resume_traffic);
         ButterKnife.bind(this);
         prefConfig = new PreferenceConfig(this);
-        formatFields();
+        presenter = new ResumeTrafficPresenter(this);
+        presenter.formatFields(txtDistance, txtTime, txtPartida, txtChegada, txtStatus);
 
         btnFinalizar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(getApplicationContext(), VisitActivity.class);
                 startActivity(i);
+                presenter.saveData();
                 finish();
             }
         });
-    }
-
-    public void formatFields(){
-        String motivoCancelamento = prefConfig.getString(getString(R.string.motivoCancelamento));
-        String status = prefConfig.getString(getString(R.string.navigationStatus));
-        txtDistance.setText(prefConfig.getString(getString(R.string.distanceTraveled)));
-        txtTime.setText(prefConfig.getString(getString(R.string.resumeTime)));
-        txtPartida.setText(prefConfig.getString(getString(R.string.partida)));
-        txtChegada.setText(prefConfig.getString(getString(R.string.destino)));
-
-        if(status.equalsIgnoreCase(getString(R.string.viagemCancelada)) && !motivoCancelamento.isEmpty()){
-            status = status + " - " + motivoCancelamento;
-        }
-        txtStatus.setText(status);
-
     }
 
     @Override

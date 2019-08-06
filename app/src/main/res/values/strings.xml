@@ -31,4 +31,5 @@
     <string name="resumeTime">Tempo de viagem</string>
     <string name="motivoCancelamento">motivoCancelamento</string>
     <string name="chegada">Chegada</string>
+    <string name="motivoViagem">Motivo da Viagem</string>
 </resources>
