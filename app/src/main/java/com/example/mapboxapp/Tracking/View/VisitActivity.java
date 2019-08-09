@@ -8,6 +8,10 @@ import android.location.Address;
 import android.location.Geocoder;
 import androidx.annotation.Nullable;
 
+import com.example.mapboxapp.Tracking.Presenter.ResumeTrafficPresenter;
+import com.example.mapboxapp.Tracking.Presenter.ResumeTrafficPresenterInt;
+import com.example.mapboxapp.Tracking.Utils.PreferenceConfig;
+import com.example.mapboxapp.Tracking.Utils.PreferenceConfigInt;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputLayout;
 import androidx.appcompat.app.AppCompatActivity;
@@ -65,6 +69,7 @@ public class VisitActivity extends AppCompatActivity {
     FloatingActionButton fabNewClient;
 
     private PreferencesManagerInt prefs;
+    private PreferenceConfigInt prefConfig;
     private boolean gpsGranted;
 
     private ArrayAdapter<String> adapter;
@@ -84,8 +89,16 @@ public class VisitActivity extends AppCompatActivity {
             edtDestinoName.setText(bundle.getString("cliente").toString());
             edtDestinoAddress.getEditText().setText(bundle.getString("endereco").toString());
         }
+        prefConfig = new PreferenceConfig(this);
         prefs = new PreferencesManager(this);
         clearPreferences();
+
+        if(!prefConfig.getString(getString(R.string.distanceTraveled)).isEmpty()){
+            //há dados para serem salvos da última viagem
+            ResumeTrafficPresenterInt resumePresenter = new ResumeTrafficPresenter(this);
+            resumePresenter.saveData();
+        }
+
         requestPermission();
         gpsGranted = prefs.getBoolean(getString(R.string.gpsGranted), 1);
         clientNames = new ArrayList<String>();

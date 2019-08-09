@@ -321,7 +321,7 @@ public class TrackingActivity extends AppCompatActivity implements OnNavigationR
                 .navigationListener(this)
                 .progressChangeListener(this)
                 .routeListener(this)
-                .shouldSimulateRoute(true);
+                .shouldSimulateRoute(false);
         return options.build();
     }
 

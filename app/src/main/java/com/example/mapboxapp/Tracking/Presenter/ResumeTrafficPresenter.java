@@ -1,7 +1,6 @@
 package com.example.mapboxapp.Tracking.Presenter;
 
 import android.content.Context;
-import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -75,11 +74,14 @@ public class ResumeTrafficPresenter implements ResumeTrafficPresenterInt {
                 if(response.body() != null){
                     Toast.makeText(context, "Dados de navegação gravados com sucesso. Chamado: "
                             + response.body().getIdChamado(), Toast.LENGTH_SHORT).show();
+                    prefConfig.clearPreferences();
                 }
             }
             @Override
             public void onFailure(Call<TrackingRegister> call, Throwable t) {
                 Toast.makeText(context, "Erro ao gravar dados de navegação", Toast.LENGTH_SHORT).show();
+                //offline storage
+
             }
         });
     }

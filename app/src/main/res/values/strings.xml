@@ -32,4 +32,6 @@
     <string name="motivoCancelamento">motivoCancelamento</string>
     <string name="chegada">Chegada</string>
     <string name="motivoViagem">Motivo da Viagem</string>
+    <string name="fail_load_states">Não foi possivel carregar os Estados!</string>
+    <string name="fail_load_cities">Não foi possível carregar as Cidades</string>
 </resources>
