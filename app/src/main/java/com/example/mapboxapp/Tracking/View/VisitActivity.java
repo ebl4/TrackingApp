@@ -8,10 +8,6 @@ import android.location.Address;
 import android.location.Geocoder;
 import androidx.annotation.Nullable;
 
-import com.example.mapboxapp.Tracking.Presenter.ResumeTrafficPresenter;
-import com.example.mapboxapp.Tracking.Presenter.ResumeTrafficPresenterInt;
-import com.example.mapboxapp.Tracking.Utils.PreferenceConfig;
-import com.example.mapboxapp.Tracking.Utils.PreferenceConfigInt;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputLayout;
 import androidx.appcompat.app.AppCompatActivity;
@@ -59,8 +55,6 @@ public class VisitActivity extends AppCompatActivity {
     TextInputLayout edtPartida;
     @BindView(R.id.edtEndereco)
     TextInputLayout edtDestinoAddress;
-    @BindView(R.id.edtMotivo)
-    TextInputLayout edtMotivo;
     @BindView(R.id.edtDestino)
     AutoCompleteTextView edtDestinoName;
     @BindView(R.id.btnRoute)
@@ -69,12 +63,11 @@ public class VisitActivity extends AppCompatActivity {
     FloatingActionButton fabNewClient;
 
     private PreferencesManagerInt prefs;
-    private PreferenceConfigInt prefConfig;
     private boolean gpsGranted;
 
-    private ArrayAdapter<String> adapter;
-    private HashMap<String, String> clients;
-    private ArrayList<String> clientNames;
+    ArrayAdapter<String> adapter;
+    HashMap<String, String> clients;
+    ArrayList<String> clientNames;
 
     public static GPSCoordinates gpsCoordinates;
     private Intent intent;
@@ -86,18 +79,11 @@ public class VisitActivity extends AppCompatActivity {
         Bundle bundle = getIntent().getExtras();
         ButterKnife.bind(this);
         if(bundle != null){
-            edtDestinoName.setText(bundle.getString("cliente").toString());
-            edtDestinoAddress.getEditText().setText(bundle.getString("endereco").toString());
+            edtDestinoName.setText(bundle.get("cliente").toString());
+            edtDestinoAddress.getEditText().setText(bundle.get("endereco").toString());
         }
-        prefConfig = new PreferenceConfig(this);
         prefs = new PreferencesManager(this);
         clearPreferences();
-
-        if(!prefConfig.getString(getString(R.string.distanceTraveled)).isEmpty()){
-            //há dados para serem salvos da última viagem
-            ResumeTrafficPresenterInt resumePresenter = new ResumeTrafficPresenter(this);
-            resumePresenter.saveData();
-        }
 
         requestPermission();
         gpsGranted = prefs.getBoolean(getString(R.string.gpsGranted), 1);
@@ -110,6 +96,7 @@ public class VisitActivity extends AppCompatActivity {
                     performRoute();
                 }
             });
+
         } else {
             // GPS nao ativado
             fineLocationExplanation();
@@ -131,20 +118,16 @@ public class VisitActivity extends AppCompatActivity {
         });
     }
 
+    public void clearPreferences(){
+        prefs.clearPreferences(1);
+    }
+
     public void requestPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         } else {
             prefs.putBoolean(getString(R.string.gpsGranted), true, 1);
         }
-    }
-
-    public void formatMotivo(){
-        prefs.putString(getString(R.string.motivoViagem), edtMotivo.getEditText().getText().toString(), 1);
-    }
-
-    public void clearPreferences(){
-        prefs.clearPreferences(1);
     }
 
     public void getClients(){
@@ -229,12 +212,10 @@ public class VisitActivity extends AppCompatActivity {
     }
 
     public void performRoute() {
-        String motivo = edtMotivo.getEditText().getText().toString();
         if(!edtDestinoAddress.getEditText().getText().toString().isEmpty()) {
             gpsCoordinates.destino = edtDestinoAddress.getEditText().getText().toString();
             if(setDestLocation()) {
                 intent = new Intent(this, TrackingActivity.class);
-                formatMotivo();
                 startActivity(intent);
             }
         } else {

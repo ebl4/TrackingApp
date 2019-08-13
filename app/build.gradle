@@ -24,7 +24,7 @@ android {
         config {
             keyAlias 'key0'
             keyPassword '123456'
-            storeFile file('C:\\Users\\edson.lima\\TrackingApp\\mapbox_key.jks')
+            storeFile file('C:\\Users\\edson.lima\\AndroidStudioProjects\\MapboxApp\\mapbox_key.jks')
             storePassword '123456'
         }
     }

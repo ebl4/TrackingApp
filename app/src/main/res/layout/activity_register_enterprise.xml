@@ -97,7 +97,7 @@
                     android:hint="CEP" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <Spinner
+            <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/inputEstado"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -107,9 +107,15 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/inputNumero">
-            </Spinner>
 
-            <Spinner
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="text"
+                    android:hint="Estado" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/inputCidade"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -119,7 +125,12 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/inputEstado">
-            </Spinner>
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Cidade" />
+            </com.google.android.material.textfield.TextInputLayout>
 
         <Button
             android:id="@+id/btnCadastrar"
@@ -135,6 +146,5 @@
             app:layout_constraintHorizontal_bias="0.498"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/inputCidade" />
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

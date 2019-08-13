@@ -1,6 +1,7 @@
 package com.example.mapboxapp.Tracking.Presenter;
 
 import android.content.Context;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -11,8 +12,6 @@ import com.example.mapboxapp.Tracking.Model.Motivo;
 import com.example.mapboxapp.Tracking.Model.TrackingRegister;
 import com.example.mapboxapp.Tracking.Utils.PreferenceConfig;
 import com.example.mapboxapp.Tracking.Utils.PreferenceConfigInt;
-import com.example.mapboxapp.Tracking.Utils.PreferencesManager;
-import com.example.mapboxapp.Tracking.Utils.PreferencesManagerInt;
 import com.example.mapboxapp.Tracking.View.VisitActivity;
 
 import retrofit2.Call;
@@ -22,12 +21,10 @@ import retrofit2.Response;
 public class ResumeTrafficPresenter implements ResumeTrafficPresenterInt {
 
     private PreferenceConfigInt prefConfig;
-    private PreferencesManagerInt prefs;
     private Context context;
 
     public ResumeTrafficPresenter(Context context){
         prefConfig = new PreferenceConfig(context);
-        prefs = new PreferencesManager(context);
         this.context = context;
     }
 
@@ -40,9 +37,7 @@ public class ResumeTrafficPresenter implements ResumeTrafficPresenterInt {
                 .append("/")
                 .append(context.getString(R.string.partida)).append(": ").append(prefConfig.getString(context.getString(R.string.partida)))
                 .append("/")
-                .append(context.getString(R.string.destino)).append(": ").append(prefConfig.getString(context.getString(R.string.destino)))
-                .append("/")
-                .append(context.getString(R.string.motivoViagem)).append(": ").append(prefs.getString(context.getString(R.string.motivoViagem), 1));
+                .append(context.getString(R.string.destino)).append(": ").append(prefConfig.getString(context.getString(R.string.destino)));
         return motivo.toString();
     }
 
@@ -74,14 +69,11 @@ public class ResumeTrafficPresenter implements ResumeTrafficPresenterInt {
                 if(response.body() != null){
                     Toast.makeText(context, "Dados de navegação gravados com sucesso. Chamado: "
                             + response.body().getIdChamado(), Toast.LENGTH_SHORT).show();
-                    prefConfig.clearPreferences();
                 }
             }
             @Override
             public void onFailure(Call<TrackingRegister> call, Throwable t) {
                 Toast.makeText(context, "Erro ao gravar dados de navegação", Toast.LENGTH_SHORT).show();
-                //offline storage
-
             }
         });
     }

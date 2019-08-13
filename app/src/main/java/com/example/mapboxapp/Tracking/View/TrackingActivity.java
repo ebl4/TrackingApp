@@ -18,17 +18,21 @@ import com.example.mapboxapp.Tracking.Utils.TrackingService;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.mapbox.android.core.permissions.PermissionsManager;
+import com.mapbox.api.directions.v5.DirectionsCriteria;
 import com.mapbox.api.directions.v5.models.DirectionsResponse;
 import com.mapbox.api.directions.v5.models.DirectionsRoute;
 import com.mapbox.api.geocoding.v5.MapboxGeocoding;
 import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.services.android.navigation.ui.v5.NavigationView;
 import com.mapbox.services.android.navigation.ui.v5.NavigationViewOptions;
 import com.mapbox.services.android.navigation.ui.v5.OnNavigationReadyCallback;
 import com.mapbox.services.android.navigation.ui.v5.listeners.NavigationListener;
 import com.mapbox.services.android.navigation.ui.v5.listeners.RouteListener;
+import com.mapbox.services.android.navigation.ui.v5.listeners.SpeechAnnouncementListener;
+import com.mapbox.services.android.navigation.ui.v5.voice.SpeechAnnouncement;
 import com.mapbox.services.android.navigation.v5.navigation.NavigationRoute;
 import com.mapbox.services.android.navigation.v5.routeprogress.ProgressChangeListener;
 import com.mapbox.services.android.navigation.v5.routeprogress.RouteProgress;
@@ -58,12 +62,8 @@ public class TrackingActivity extends AppCompatActivity implements OnNavigationR
     private RouteProgress routeProgress;
     FloatingActionButton fabFinish;
 
-    // Variables needed to handle location permissions
-    private PermissionsManager permissionsManager;
-    private MapboxMap mapboxMap;
-    // Variables needed to add the location engine
     private PreferenceConfig prefConfig;
-    private Double latitude, longitude;
+    private Double totalDistanceTraveled;
     long tempoInicioViagem, tempoFimViagem;
 
     @SuppressLint("RestrictedApi")
@@ -74,6 +74,7 @@ public class TrackingActivity extends AppCompatActivity implements OnNavigationR
         super.onCreate(savedInstanceState);
         navigationCanceled = false;
         prefConfig = new PreferenceConfig(this);
+        totalDistanceTraveled = 0.0;
 
         prefConfig.putString(getString(R.string.partida), gpsCoordinates.partida);
         prefConfig.putString(getString(R.string.destino), gpsCoordinates.destino);
@@ -84,6 +85,7 @@ public class TrackingActivity extends AppCompatActivity implements OnNavigationR
         fabFinish = findViewById(R.id.fabFinish);
         navigationView = findViewById(R.id.nvView);
         navigationView.onCreate(savedInstanceState);
+
         navigationView.initialize(this);
         tempoInicioViagem = System.currentTimeMillis();
 
@@ -175,11 +177,11 @@ public class TrackingActivity extends AppCompatActivity implements OnNavigationR
         else{
             AlertDialog alertDialog = new AlertDialog.Builder(this).create();
             alertDialog.setMessage(getString(R.string.dropoff_dialog_text));
-            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.ok),
+            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.error_address_navigation),
                     (dialogInterface, in) -> finish());
-            alertDialog.setCanceledOnTouchOutside(false);
             alertDialog.show();
         }
+        //navigationView.findViewById(R.id.soundFab).setVisibility(View.GONE);
     }
 
     @Override
@@ -206,7 +208,7 @@ public class TrackingActivity extends AppCompatActivity implements OnNavigationR
     public void saveData(){
         tempoFimViagem = System.currentTimeMillis();
         if(routeProgress != null){
-            prefConfig.putString(getString(R.string.distanceTraveled), formatDistance(routeProgress.distanceTraveled()));
+            prefConfig.putString(getString(R.string.distanceTraveled), formatDistance(totalDistanceTraveled + routeProgress.distanceTraveled()));
         }
         prefConfig.putString(getString(R.string.resumeTime), formatResumeTime(tempoFimViagem - tempoInicioViagem));
     }
@@ -228,7 +230,6 @@ public class TrackingActivity extends AppCompatActivity implements OnNavigationR
 
     @Override
     public void onRerouteAlong(DirectionsRoute directionsRoute) {
-
     }
 
     @Override
@@ -241,7 +242,8 @@ public class TrackingActivity extends AppCompatActivity implements OnNavigationR
         if (!dropoffDialogShown && !points.isEmpty()) {
             showDropoffDialog();
             dropoffDialogShown = true; // Accounts for multiple arrival events
-            Toast.makeText(this, "You have arrived! ", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, "You have arrived! ", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, "Distância: " +formatDistance(routeProgress.distanceTraveled()), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -250,10 +252,13 @@ public class TrackingActivity extends AppCompatActivity implements OnNavigationR
     public void onProgressChange(Location location, RouteProgress routeProgress) {
         lastKnownLocation = location;
         this.routeProgress = routeProgress;
+        totalDistanceTraveled += routeProgress.distanceTraveled();
+
         if(routeProgress.distanceRemaining() < 50){
             fabFinish.setVisibility(View.VISIBLE);
         }
-        //Snackbar.make(navigationView, "Distância: " + formatDistance(routeProgress.distanceTraveled()), Snackbar.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(), "Distância: " +
+                formatDistance(totalDistanceTraveled), Toast.LENGTH_SHORT).show();
     }
 
     public String formatDistance(double distance){
@@ -268,10 +273,10 @@ public class TrackingActivity extends AppCompatActivity implements OnNavigationR
 
     public String formatResumeTime(long resumeTime){
         if(resumeTime >= 60000){
-            return String.valueOf(resumeTime/60000)+" min";
+            return (resumeTime/60000)+" min";
         }
         else{
-            return String.valueOf(resumeTime/1000)+" seg";
+            return (resumeTime/1000)+" seg";
         }
     }
 
@@ -294,11 +299,13 @@ public class TrackingActivity extends AppCompatActivity implements OnNavigationR
     }
 
     private void fetchRoute(Point origin, Point destination) {
+        Locale ptLocale = new Locale("pt-BR");
         NavigationRoute.builder(this)
                 .accessToken(Mapbox.getAccessToken())
                 .origin(origin)
                 .destination(destination)
                 .alternatives(true)
+                .language(ptLocale)
                 .build()
                 .getRoute(new Callback<DirectionsResponse>() {
                     @Override
@@ -321,7 +328,7 @@ public class TrackingActivity extends AppCompatActivity implements OnNavigationR
                 .navigationListener(this)
                 .progressChangeListener(this)
                 .routeListener(this)
-                .shouldSimulateRoute(false);
+                .shouldSimulateRoute(true);
         return options.build();
     }
 

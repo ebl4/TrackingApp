@@ -29,15 +29,15 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginLeft="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:layout_marginRight="16dp"
         android:background="@drawable/roundbtn"
-        android:text="Iniciar visita"
+        android:text="Iniciar viagem"
         android:textColor="@color/mapboxWhite"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.531"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edtMotivo" />
+        app:layout_constraintTop_toBottomOf="@+id/edtEndereco" />
 
     <AutoCompleteTextView
         android:id="@+id/edtDestino"
@@ -79,24 +79,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Seu destino"
-            android:inputType="none" />
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/edtMotivo"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edtEndereco">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Motivo da visita"
             android:inputType="none" />
     </com.google.android.material.textfield.TextInputLayout>
 
