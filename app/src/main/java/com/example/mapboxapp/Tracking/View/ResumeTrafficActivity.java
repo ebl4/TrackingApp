@@ -57,6 +57,14 @@ public class ResumeTrafficActivity extends AppCompatActivity {
         super.onBackPressed();
         Intent i = new Intent(getApplicationContext(), VisitActivity.class);
         startActivity(i);
+        presenter.saveData();
+        finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        presenter.saveData();
         finish();
     }
 }
