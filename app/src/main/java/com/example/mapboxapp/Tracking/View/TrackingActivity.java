@@ -208,7 +208,7 @@ public class TrackingActivity extends AppCompatActivity implements OnNavigationR
     public void saveData(){
         tempoFimViagem = System.currentTimeMillis();
         if(routeProgress != null){
-            prefConfig.putString(getString(R.string.distanceTraveled), formatDistance(totalDistanceTraveled + routeProgress.distanceTraveled()));
+            prefConfig.putString(getString(R.string.distanceTraveled), formatDistance(totalDistanceTraveled));
         }
         prefConfig.putString(getString(R.string.resumeTime), formatResumeTime(tempoFimViagem - tempoInicioViagem));
     }
@@ -252,7 +252,12 @@ public class TrackingActivity extends AppCompatActivity implements OnNavigationR
     public void onProgressChange(Location location, RouteProgress routeProgress) {
         lastKnownLocation = location;
         this.routeProgress = routeProgress;
-        totalDistanceTraveled += routeProgress.distanceTraveled();
+        if(totalDistanceTraveled <= routeProgress.distanceTraveled()){
+            totalDistanceTraveled = routeProgress.distanceTraveled();
+        }
+        else{
+            totalDistanceTraveled += routeProgress.distanceTraveled();
+        }
 
         if(routeProgress.distanceRemaining() < 50){
             fabFinish.setVisibility(View.VISIBLE);

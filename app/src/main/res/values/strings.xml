@@ -31,4 +31,8 @@
     <string name="resumeTime">Tempo de viagem</string>
     <string name="motivoCancelamento">motivoCancelamento</string>
     <string name="chegada">Chegada</string>
+    <string name="fail_load_states">Não foi possivel carregar os Estados</string>
+    <string name="fail_load_cities">Não foi possivel carregar as Cidades</string>
+    <string name="clientName">clientName</string>
+    <string name="motivoViagem">Motivo da Viagem</string>
 </resources>

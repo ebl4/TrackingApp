@@ -1,8 +1,14 @@
 package com.example.mapboxapp.Retrofit.services;
 
 
+import com.example.mapboxapp.Tracking.Model.CidadeRegister;
+import com.example.mapboxapp.Tracking.Model.Empresa;
+import com.example.mapboxapp.Tracking.Model.EstadoRegister;
+import com.example.mapboxapp.Tracking.Model.FirstTrackingRegister;
+import com.example.mapboxapp.Tracking.Model.IdEstado;
 import com.example.mapboxapp.Tracking.Model.Motivo;
 import com.example.mapboxapp.Tracking.Model.TrackingRegister;
+import com.example.mapboxapp.Tracking.Model.TrackingResponseChamado;
 import com.example.mapboxapp.Tracking.Model.UserRegister;
 
 import org.json.JSONObject;
@@ -24,4 +30,16 @@ public interface Services {
 
     @POST("CriarChamado?idItemDeCatalogo=363&login=gbsadmin")
     Call<TrackingRegister> criarChamadoNavegacao(@Body Motivo motivo);
+
+    @POST("AlterarEntradasDoChamado?login=gbsadmin")
+    Call<TrackingResponseChamado> alterarChamadoNavegacao(@Body FirstTrackingRegister firstRegister);
+
+    @POST("CriarEmpresaComEndereco")
+    Call<Void> criarEmpresa(@Body Empresa empresa);
+
+    @GET("ObterListaDeEstados")
+    Call<EstadoRegister> getEstado();
+
+    @POST("ObterListaDeCidades")
+    Call<CidadeRegister> getCidade(@Body IdEstado idEstado);
 }

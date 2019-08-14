@@ -17,7 +17,9 @@
         <activity android:name=".Reroute.activity.NavigationActivity"></activity>
         <activity android:name=".Reroute.activity.MainActivity"></activity>
         <activity android:name=".Reroute.activity.RerouteActivity"></activity>
-        <activity android:name=".Tracking.View.TrackingActivity"></activity>
+        <activity android:name=".Tracking.View.TrackingActivity"
+            android:screenOrientation="portrait"
+            />
         <activity android:name=".Tracking.View.ResumeTrafficActivity"></activity>
         <activity android:name=".Tracking.View.VisitActivity">
             <intent-filter>

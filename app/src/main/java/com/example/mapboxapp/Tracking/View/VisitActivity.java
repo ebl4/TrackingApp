@@ -8,6 +8,8 @@ import android.location.Address;
 import android.location.Geocoder;
 import androidx.annotation.Nullable;
 
+import com.example.mapboxapp.Tracking.Utils.PreferenceConfig;
+import com.example.mapboxapp.Tracking.Utils.PreferenceConfigInt;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputLayout;
 import androidx.appcompat.app.AppCompatActivity;
@@ -55,6 +57,8 @@ public class VisitActivity extends AppCompatActivity {
     TextInputLayout edtPartida;
     @BindView(R.id.edtEndereco)
     TextInputLayout edtDestinoAddress;
+    @BindView(R.id.edtMotivo)
+    TextInputLayout edtMotivo;
     @BindView(R.id.edtDestino)
     AutoCompleteTextView edtDestinoName;
     @BindView(R.id.btnRoute)
@@ -63,6 +67,7 @@ public class VisitActivity extends AppCompatActivity {
     FloatingActionButton fabNewClient;
 
     private PreferencesManagerInt prefs;
+    private PreferenceConfigInt prefConfig;
     private boolean gpsGranted;
 
     ArrayAdapter<String> adapter;
@@ -78,11 +83,12 @@ public class VisitActivity extends AppCompatActivity {
         setContentView(R.layout.activity_visit);
         Bundle bundle = getIntent().getExtras();
         ButterKnife.bind(this);
+        prefs = new PreferencesManager(this);
+        prefConfig = new PreferenceConfig(this);
         if(bundle != null){
             edtDestinoName.setText(bundle.get("cliente").toString());
             edtDestinoAddress.getEditText().setText(bundle.get("endereco").toString());
         }
-        prefs = new PreferencesManager(this);
         clearPreferences();
 
         requestPermission();
@@ -116,6 +122,14 @@ public class VisitActivity extends AppCompatActivity {
                 edtDestinoAddress.getEditText().setText(clients.get(edtDestinoName.getText().toString()));
             }
         });
+    }
+
+    public void formatMotivo(){
+        prefs.putString(getString(R.string.motivoViagem), edtMotivo.getEditText().getText().toString(), 1);
+    }
+
+    public void formatNomeDestino(){
+        prefConfig.putString(getString(R.string.clientName), edtDestinoName.getText().toString());
     }
 
     public void clearPreferences(){
@@ -216,6 +230,8 @@ public class VisitActivity extends AppCompatActivity {
             gpsCoordinates.destino = edtDestinoAddress.getEditText().getText().toString();
             if(setDestLocation()) {
                 intent = new Intent(this, TrackingActivity.class);
+                formatNomeDestino();
+                formatMotivo();
                 startActivity(intent);
             }
         } else {
