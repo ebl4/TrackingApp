@@ -36,7 +36,7 @@ android {
         minSdkVersion 19
         targetSdkVersion 28
         versionCode 1
-        versionName "1.0"
+        versionName "1.0.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -55,7 +55,7 @@ dependencies {
     implementation 'com.mapbox.mapboxsdk:mapbox-android-navigation-ui:0.41.0'
     implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:8.1.0'
     implementation 'com.google.android.gms:play-services-location:17.0.0'
-
+    implementation 'com.mapbox.mapboxsdk:mapbox-android-plugin-markerview-v8:0.3.0'
     implementation 'com.jakewharton:butterknife:10.1.0'
     annotationProcessor 'com.jakewharton:butterknife-compiler:10.1.0'
 

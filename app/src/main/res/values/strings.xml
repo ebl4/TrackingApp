@@ -22,7 +22,11 @@
     <string name="partida">Partida</string>
     <string name="destino">Destino</string>
     <string name="alertInterrupted">Você está com uma viagem em andamento. Tem certeza que deseja finalizar?</string>
+    <string name="alertSaveData">Você tem dados das últimas viagens não salvos. Deseja realizar a sincronização?</string>
+    <string name="wazeNavigation">Você deseja iniciar a navegação com o Waze?</string>
     <string name="ok">Ok</string>
+    <string name="yes">Sim</string>
+    <string name="defaultNavigation">Navegação padrão</string>
     <string name="navigationStatus">navigationStatus</string>
     <string name="viagemCancelada">Viagem Cancelada</string>
     <string name="viagemConcluida">Viagem Finalizada</string>
@@ -35,4 +39,14 @@
     <string name="fail_load_cities">Não foi possivel carregar as Cidades</string>
     <string name="clientName">clientName</string>
     <string name="motivoViagem">Motivo da Viagem</string>
+    <string name="sincronizationAfter">Sincronizar mais tarde</string>
+
+    <string name="open_drawer" translatable="false">Abrir</string>
+    <string name="close_drawer" translatable="false">Fechar</string>
+    <string name="string_seu_local">Seu Local</string>
+    <string name="string_seu_destino">Seu Destino</string>
+    <string name="minRouteDistance">minRouteDistance</string>
+    <string name="minRouteTime">minRouteTime</string>
+    <string name="minRouteAddress">minRouteAddress</string>
+    >
 </resources>

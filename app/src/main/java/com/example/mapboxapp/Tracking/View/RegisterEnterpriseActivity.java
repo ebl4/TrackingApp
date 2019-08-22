@@ -6,12 +6,10 @@ import butterknife.ButterKnife;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -82,41 +80,50 @@ public class RegisterEnterpriseActivity extends AppCompatActivity {
 
     public void saveData(){
         String edtNome, edtLogradouro, edtNumero, edtBairro, edtCEP, edtEstado, edtCidade;
-        Empresa empresa = new Empresa();
+        Empresa empresa;
         edtNome = inputName.getEditText().getText().toString();
-        int codCidade, codEstado;
         edtLogradouro = inputLogradouro.getEditText().getText().toString();
         edtNumero = inputNumero.getEditText().getText().toString();
         edtBairro = inputBairro.getEditText().getText().toString();
         edtCEP = inputCEP.getEditText().getText().toString();
-        edtCidade = inputCidade.getSelectedItem().toString();
+
+        if(inputCidade.getSelectedItem() == null || inputEstado.getSelectedItem() == null)
+            return;
         edtEstado = inputEstado.getSelectedItem().toString();
-        codEstado = presenter.returnEstadoCode(inputEstado.getSelectedItemPosition());
+        edtCidade = inputCidade.getSelectedItem().toString();
+
+        clearFields();
 
         if(edtNome.length() <= 3){
             inputName.setError("Por favor digite um nome válido");
             inputName.requestFocus();
-        }
-        else if(edtLogradouro.length() <= 3){
-            inputLogradouro.setError("Por favor digite um logradouro válido");
-            inputLogradouro.requestFocus();
-        }
-        else if(edtNumero.length() <= 0){
-            inputNumero.setError("Por favor digite um número válido");
-            inputNumero.requestFocus();
-        }
-        else if(edtBairro.length() <= 3){
-            inputBairro.setError("Por favor digite um bairro válido");
-            inputBairro.requestFocus();
+            return;
         }
         else if(edtCEP.length() <= 3){
             inputCEP.setError("Por favor digite um cep válido");
             inputCEP.requestFocus();
+            return;
         }
+        else if(edtLogradouro.length() <= 3){
+            inputLogradouro.setError("Por favor digite um logradouro válido");
+            inputLogradouro.requestFocus();
+            return;
+        }
+        else if(edtNumero.length() <= 0){
+            inputNumero.setError("Por favor digite um número válido");
+            inputNumero.requestFocus();
+            return;
+        }
+        else if(edtBairro.length() <= 3){
+            inputBairro.setError("Por favor digite um bairro válido");
+            inputBairro.requestFocus();
+            return;
+        }
+
         empresa = presenter.formatEmpresa(edtNome, "", edtEstado, edtCidade, edtCEP,
                 edtBairro, edtLogradouro, edtNumero, "");
         presenter.makeRequest(empresa);
-        Intent intent = new Intent(this, VisitActivity.class);
+        Intent intent = new Intent(this, VisitView.class);
         intent.putExtra("cliente", edtNome);
         intent.putExtra("endereco", edtLogradouro + " "
                 + edtNumero + " " + edtBairro + " " + edtCidade);
@@ -156,6 +163,14 @@ public class RegisterEnterpriseActivity extends AppCompatActivity {
         ArrayAdapter<String> spnCidadeAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, cidadeName);
         inputCidade.setAdapter(spnCidadeAdapter);
         spnCidadeAdapter.notifyDataSetChanged();
+    }
+
+    public void clearFields(){
+        inputName.setError(null);
+        inputCEP.setError(null);
+        inputCEP.setError(null);
+        inputLogradouro.setError(null);
+        inputNumero.setError(null);
     }
 
     public void showErrorRequest(String message) {

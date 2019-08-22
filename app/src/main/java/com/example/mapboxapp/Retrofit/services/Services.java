@@ -6,17 +6,15 @@ import com.example.mapboxapp.Tracking.Model.Empresa;
 import com.example.mapboxapp.Tracking.Model.EstadoRegister;
 import com.example.mapboxapp.Tracking.Model.FirstTrackingRegister;
 import com.example.mapboxapp.Tracking.Model.IdEstado;
+import com.example.mapboxapp.Tracking.Model.SecondTrackingRegister;
 import com.example.mapboxapp.Tracking.Model.Motivo;
 import com.example.mapboxapp.Tracking.Model.TrackingRegister;
 import com.example.mapboxapp.Tracking.Model.TrackingResponseChamado;
 import com.example.mapboxapp.Tracking.Model.UserRegister;
 
-import org.json.JSONObject;
-
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
-import retrofit2.http.Headers;
 import retrofit2.http.POST;
 
 /**
@@ -25,7 +23,7 @@ import retrofit2.http.POST;
 
 public interface Services {
 
-    @GET("ObterEmpresasComEndereco?comTraking=true")
+    @GET("ObterEmpresasComEndereco")
     Call<UserRegister> getEmpresas();
 
     @POST("CriarChamado?idItemDeCatalogo=363&login=gbsadmin")
@@ -33,6 +31,9 @@ public interface Services {
 
     @POST("AlterarEntradasDoChamado?login=gbsadmin")
     Call<TrackingResponseChamado> alterarChamadoNavegacao(@Body FirstTrackingRegister firstRegister);
+
+    @POST("AlterarEntradasDoChamado?login=gbsadmin")
+    Call<TrackingResponseChamado> alterarChamadoMenorRota(@Body SecondTrackingRegister register);
 
     @POST("CriarEmpresaComEndereco")
     Call<Void> criarEmpresa(@Body Empresa empresa);

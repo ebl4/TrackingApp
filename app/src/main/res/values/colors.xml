@@ -1,10 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#008577</color>
-    <color name="colorPrimaryButton">#126e40</color>
-    <color name="colorPrimaryDark">#00574B</color>
-    <color name="colorAccent">#D81B60</color>
-    <color name="mapboxWhite">#FFFFFF</color>
-    <color name="mapboxBlue">#1F38BE</color>
+    <color name="colorPrimary">#3f51b5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="green_sette">#5a00d87c</color>
+    <color name="green_sette_dark">#006a3d</color>
+    <color name="green_sette_original">#7cca00</color>
+    <color name="background_material_light">#f1f1f1</color>
+    <color name="greenDarker">#25513e</color>
+    <color name="red">#ff0000</color>
+    <color name="yellowpalha">#ffeb3b</color>
+    <color name="palha">#d4d0aa</color>
+    <color name="palha2">#a09d7b</color>
+    <color name="lightgreen">#daf2d3</color>
+    <color name="green3">#8aa07b</color>
+    <color name="greengrey">#85987b</color>
+    <color name="teal">#00796b</color>
+    <color name="grey">#f0f0f0</color>
+    <color name="black">#000000</color>
     <color name="darkGrey">#1c1c1c</color>
+    <color name="ole_red">#9e0001</color>
+    <color name="mediumGray">#afbab3</color>
+    <color name="dataColor">#696969</color>
+    <color name="mapboxWhite">#FFFFFF</color>
+    <color name="colorPrimaryButton">#126e40</color>
+    <color name="black_semi_transparent">#B2000000</color>
 </resources>

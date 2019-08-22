@@ -16,23 +16,16 @@ import com.example.mapboxapp.R;
 import com.example.mapboxapp.Tracking.Utils.PreferenceConfig;
 import com.example.mapboxapp.Tracking.Utils.TrackingService;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-import com.mapbox.android.core.permissions.PermissionsManager;
-import com.mapbox.api.directions.v5.DirectionsCriteria;
 import com.mapbox.api.directions.v5.models.DirectionsResponse;
 import com.mapbox.api.directions.v5.models.DirectionsRoute;
 import com.mapbox.api.geocoding.v5.MapboxGeocoding;
 import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.Mapbox;
-import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.services.android.navigation.ui.v5.NavigationView;
 import com.mapbox.services.android.navigation.ui.v5.NavigationViewOptions;
 import com.mapbox.services.android.navigation.ui.v5.OnNavigationReadyCallback;
 import com.mapbox.services.android.navigation.ui.v5.listeners.NavigationListener;
 import com.mapbox.services.android.navigation.ui.v5.listeners.RouteListener;
-import com.mapbox.services.android.navigation.ui.v5.listeners.SpeechAnnouncementListener;
-import com.mapbox.services.android.navigation.ui.v5.voice.SpeechAnnouncement;
 import com.mapbox.services.android.navigation.v5.navigation.NavigationRoute;
 import com.mapbox.services.android.navigation.v5.routeprogress.ProgressChangeListener;
 import com.mapbox.services.android.navigation.v5.routeprogress.RouteProgress;
@@ -41,14 +34,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.constraintlayout.widget.ConstraintSet;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static android.view.View.INVISIBLE;
-import static com.example.mapboxapp.Tracking.View.VisitActivity.gpsCoordinates;
+import static com.example.mapboxapp.Tracking.View.VisitView.gpsCoordinates;
 
 public class TrackingActivity extends AppCompatActivity implements OnNavigationReadyCallback,
         NavigationListener, RouteListener, ProgressChangeListener {
@@ -199,7 +189,7 @@ public class TrackingActivity extends AppCompatActivity implements OnNavigationR
         saveData();
         prefConfig.putString(getString(R.string.navigationStatus), navigationCanceled ?
                 getString(R.string.viagemCancelada) : getString(R.string.viagemConcluida));
-        Intent intent = new Intent(this, ResumeTrafficActivity.class);
+        Intent intent = new Intent(this, ResumeTrafficView.class);
         startActivity(intent);
         navigationView.stopNavigation();
         finish();

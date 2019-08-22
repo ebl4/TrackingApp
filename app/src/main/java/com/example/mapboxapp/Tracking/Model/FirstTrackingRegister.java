@@ -74,4 +74,44 @@ public class FirstTrackingRegister {
     public void setAuxiliarEntrada3(String auxiliarEntrada3) {
         this.auxiliarEntrada3 = auxiliarEntrada3;
     }
+
+    public Integer getIdChamado() {
+        return idChamado;
+    }
+
+    public String getNomeEntrada1() {
+        return nomeEntrada1;
+    }
+
+    public String getValorEntrada1() {
+        return valorEntrada1;
+    }
+
+    public String getAuxiliarEntrada1() {
+        return auxiliarEntrada1;
+    }
+
+    public String getNomeEntrada2() {
+        return nomeEntrada2;
+    }
+
+    public String getValorEntrada2() {
+        return valorEntrada2;
+    }
+
+    public String getAuxiliarEntrada2() {
+        return auxiliarEntrada2;
+    }
+
+    public String getNomeEntrada3() {
+        return nomeEntrada3;
+    }
+
+    public String getValorEntrada3() {
+        return valorEntrada3;
+    }
+
+    public String getAuxiliarEntrada3() {
+        return auxiliarEntrada3;
+    }
 }

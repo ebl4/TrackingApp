@@ -33,7 +33,7 @@ public class CancelNavigationActivity extends AppCompatActivity {
         cancelNavigationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), ResumeTrafficActivity.class);
+                Intent intent = new Intent(getApplicationContext(), ResumeTrafficView.class);
                 prefs.putString(getString(R.string.motivoCancelamento), edtMotivo.getText().toString());
                 startActivity(intent);
                 finishAffinity();
