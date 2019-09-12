@@ -12,7 +12,6 @@ import com.example.mapboxapp.Retrofit.services.Services;
 import com.example.mapboxapp.Tracking.Database.TrackingContract;
 import com.example.mapboxapp.Tracking.Database.TrackingDbHelper;
 import com.example.mapboxapp.Tracking.Model.FirstTrackingRegister;
-import com.example.mapboxapp.Tracking.Model.ResumeTrafficViewInt;
 import com.example.mapboxapp.Tracking.Model.SecondTrackingRegister;
 import com.example.mapboxapp.Tracking.Model.Motivo;
 import com.example.mapboxapp.Tracking.Model.TrackingRegister;
@@ -22,12 +21,17 @@ import com.example.mapboxapp.Tracking.Utils.PreferenceConfigInt;
 import com.example.mapboxapp.Tracking.Utils.PreferencesManager;
 import com.example.mapboxapp.Tracking.Utils.PreferencesManagerInt;
 import com.example.mapboxapp.Tracking.View.ResumeTrafficView;
-import com.example.mapboxapp.Tracking.View.VisitView;
+import com.example.mapboxapp.Tracking.View.ResumeTrafficViewInt;
+import com.example.mapboxapp.Tracking.View.Fragments.VisitFragment;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+/**
+ * Class that implements and format tracking information, such as distance traveled, tracking time
+ * and store data in the Web Service or save data offline
+ */
 public class ResumeTrafficPresenter implements ResumeTrafficPresenterInt {
 
     private PreferenceConfigInt prefConfig;
@@ -47,15 +51,30 @@ public class ResumeTrafficPresenter implements ResumeTrafficPresenterInt {
         return context.getString(R.string.motivoViagem) + ": " + prefs.getString(context.getString(R.string.motivoViagem), 1);
     }
 
+    /**
+     * Receives data from navigation such as destination and distance traveled and set them for
+     * save in the Web Service
+     * @param option
+     * @param params
+     * @return Second Tracking Regiter for SSM Web Service
+     */
     public SecondTrackingRegister formatMinRouteRegister(int option, String...params){
         SecondTrackingRegister register = new SecondTrackingRegister();
         FirstTrackingRegister firstTrackingRegister = this.formatFirstRegiter(option, params);
         register.setData(firstTrackingRegister);
-        register.setPosicaoEntrada3(5);
+        register.setPosicaoEntrada3(6);
         return register;
     }
 
+    /**
+     * Set each of the navigation information according with option that
+     * indicates the part of the SSM Web Service register
+     * @param option
+     * @param params
+     * @return FirstTrackingRegister a type of register for Web Service
+     */
     public FirstTrackingRegister formatFirstRegiter(int option, String...params){
+        String[] splitResult;
         FirstTrackingRegister register = new FirstTrackingRegister();
         register.setNomeEntrada1(params[0]);
         register.setNomeEntrada2(params[1]);
@@ -63,45 +82,52 @@ public class ResumeTrafficPresenter implements ResumeTrafficPresenterInt {
         switch (option){
             case 1:
                 register.setValorEntrada1(prefConfig.getString(context.getString(R.string.partida)));
-                register.setAuxiliarEntrada1(prefConfig.getString(context.getString(R.string.partida)));
+                register.setValorAuxiliarEntrada1(prefConfig.getString(context.getString(R.string.partida)));
 
                 register.setValorEntrada2(prefConfig.getString(context.getString(R.string.partida)));
-                register.setAuxiliarEntrada2(prefConfig.getString(context.getString(R.string.partida)));
+                register.setValorAuxiliarEntrada2(prefConfig.getString(context.getString(R.string.partida)));
 
                 register.setValorEntrada3(prefConfig.getString(context.getString(R.string.clientName)));
-                register.setAuxiliarEntrada3(prefConfig.getString(context.getString(R.string.clientName)));
+                register.seValorAuxiliarEntrada3(prefConfig.getString(context.getString(R.string.clientName)));
                 break;
             case 2:
                 register.setValorEntrada1(prefConfig.getString(context.getString(R.string.destino)));
-                register.setAuxiliarEntrada1(prefConfig.getString(context.getString(R.string.destino)));
+                register.setValorAuxiliarEntrada1(prefConfig.getString(context.getString(R.string.destino)));
 
-                register.setValorEntrada2(prefConfig.getString(context.getString(R.string.distanceTraveled)));
-                register.setAuxiliarEntrada2(prefConfig.getString(context.getString(R.string.distanceTraveled)));
-
-                register.setValorEntrada3(prefConfig.getString(context.getString(R.string.resumeTime)));
-                register.setAuxiliarEntrada3(prefConfig.getString(context.getString(R.string.resumeTime)));
+                splitResult = prefConfig.getString(context.getString(R.string.distanceTraveled)).split(" ");
+                register.setValorEntrada2(splitResult[0]);
+                register.setValorAuxiliarEntrada2(splitResult[1]);
+                splitResult = prefConfig.getString(context.getString(R.string.resumeTime)).split(" ");
+                register.setValorEntrada3(splitResult[0]);
+                register.seValorAuxiliarEntrada3(splitResult[1]);
                 break;
             case 3:
                 register.setValorEntrada1(prefConfig.getString(context.getString(R.string.minRouteAddress)));
-                register.setAuxiliarEntrada1(prefConfig.getString(context.getString(R.string.minRouteAddress)));
+                register.setValorAuxiliarEntrada1(prefConfig.getString(context.getString(R.string.minRouteAddress)));
 
-                register.setValorEntrada2(prefConfig.getString(context.getString(R.string.minRouteDistance)));
-                register.setAuxiliarEntrada2(prefConfig.getString(context.getString(R.string.minRouteDistance)));
+                splitResult = prefConfig.getString(context.getString(R.string.minRouteDistance)).split(" ");
+                register.setValorEntrada2(splitResult[0]);
+                register.setValorAuxiliarEntrada2(splitResult[1]);
 
-                register.setValorEntrada3(prefConfig.getString(context.getString(R.string.minRouteTime)));
-                register.setAuxiliarEntrada3(prefConfig.getString(context.getString(R.string.minRouteTime)));
+                splitResult = prefConfig.getString(context.getString(R.string.minRouteTime)).split(" ");
+                register.setValorEntrada3(splitResult[0]);
+                register.seValorAuxiliarEntrada3(splitResult[1]);
                 break;
         }
 
         return register;
     }
 
+    /**
+     * Format all navigation fields related to tracking activity
+     * to show in the view
+     * @param views
+     */
     public void formatFields(TextView...views){
         String motivoCancelamento = prefConfig.getString(context.getString(R.string.motivoCancelamento));
         String status = prefConfig.getString(context.getString(R.string.navigationStatus));
-        String motivo;
         views[0].setText(prefConfig.getString(context.getString(R.string.distanceTraveled)));
-        views[1].setText(prefConfig.getString(context.getString(R.string.resumeTime)));
+        views[1].setText(formatDuration(prefConfig.getString(context.getString(R.string.resumeTime))));
         views[2].setText(prefConfig.getString(context.getString(R.string.partida)));
         views[3].setText(prefConfig.getString(context.getString(R.string.destino)));
 
@@ -113,7 +139,9 @@ public class ResumeTrafficPresenter implements ResumeTrafficPresenterInt {
 
     @Override
     public void saveData(){
-        Services service = RetrofitConfig.getRetrofitInstance(VisitView.CLIENTS_URL).create(Services.class);
+        view.showDialog();
+
+        Services service = RetrofitConfig.getRetrofitInstance(VisitFragment.CLIENTS_URL).create(Services.class);
         Motivo motivo = new Motivo();
         FirstTrackingRegister firstRegister =
                 this.formatFirstRegiter(1, "Origem (Cliente)", "Origem (Endereço)", "Destino (Cliente)");
@@ -131,14 +159,13 @@ public class ResumeTrafficPresenter implements ResumeTrafficPresenterInt {
                 if(response.body() != null){
                     view.showNavigationSuccess("Dados de navegação gravados com sucesso. Chamado: "
                             + response.body().getIdChamado());
-//                    Toast.makeText(context, "Dados de navegação gravados com sucesso. Chamado: "
-//                            + response.body().getIdChamado(), Toast.LENGTH_SHORT).show();
                     firstRegister.setIdChamado(response.body().getIdChamado());
                     lastRegister.setIdChamado(response.body().getIdChamado());
                     secondRegister.setIdChamado(response.body().getIdChamado());
                     saveFirstDataChamado(firstRegister, service);
                     saveFirstDataChamado(lastRegister, service);
                     saveMenorRotaChamado(secondRegister, service);
+                    view.hideDialog();
                 }
             }
             @Override
@@ -163,6 +190,8 @@ public class ResumeTrafficPresenter implements ResumeTrafficPresenterInt {
                 values.put(TrackingContract.TrackingEntry.COLUMN_NAME_MENOR_ROTA_TEMPO, lastRegister.getValorEntrada3());
 
                 long newRowId = db.insert(TrackingContract.TrackingEntry.TABLE_NAME, null, values);
+
+                view.hideDialog();
             }
         });
     }
@@ -204,4 +233,11 @@ public class ResumeTrafficPresenter implements ResumeTrafficPresenterInt {
             }
         });
     }
+
+    public String formatDuration(String duration){
+        return duration.replace("mm", "min")
+                .replace("hh", "h")
+                .replace("ss", "seg");
+    }
+
 }

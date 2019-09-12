@@ -9,10 +9,13 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import com.example.mapboxapp.R;
+import com.example.mapboxapp.Tracking.Presenter.TrackingPresenter;
+import com.example.mapboxapp.Tracking.Presenter.TrackingPresenterInt;
 import com.example.mapboxapp.Tracking.Utils.PreferenceConfig;
 import com.example.mapboxapp.Tracking.Utils.TrackingService;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -29,7 +32,6 @@ import com.mapbox.services.android.navigation.ui.v5.listeners.RouteListener;
 import com.mapbox.services.android.navigation.v5.navigation.NavigationRoute;
 import com.mapbox.services.android.navigation.v5.routeprogress.ProgressChangeListener;
 import com.mapbox.services.android.navigation.v5.routeprogress.RouteProgress;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -38,23 +40,27 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static com.example.mapboxapp.Tracking.View.VisitView.gpsCoordinates;
+import static com.example.mapboxapp.Tracking.View.Fragments.VisitFragment.gpsCoordinates;
 
 public class TrackingActivity extends AppCompatActivity implements OnNavigationReadyCallback,
         NavigationListener, RouteListener, ProgressChangeListener {
 
     private static final String TAG = "TrackingActivity";
     private NavigationView navigationView;
-    private boolean dropoffDialogShown, navigationCanceled;
+    private boolean dropoffDialogShown, navigationCanceled, arrived, rerouteAlong;
     private Location lastKnownLocation;
     private List<Point> points = new ArrayList<>();
     private MapboxGeocoding geocoding;
     private RouteProgress routeProgress;
+
     FloatingActionButton fabFinish;
+    private TextView txtDistance;
 
     private PreferenceConfig prefConfig;
+    private TrackingPresenterInt presenter;
     private Double totalDistanceTraveled;
     long tempoInicioViagem, tempoFimViagem;
+    private Route route;
 
     @SuppressLint("RestrictedApi")
     @Override
@@ -62,21 +68,17 @@ public class TrackingActivity extends AppCompatActivity implements OnNavigationR
         Mapbox.getInstance(this, getString(R.string.access_token));
         setTheme(R.style.Theme_AppCompat_NoActionBar);
         super.onCreate(savedInstanceState);
-        navigationCanceled = false;
-        prefConfig = new PreferenceConfig(this);
-        totalDistanceTraveled = 0.0;
 
-        prefConfig.putString(getString(R.string.partida), gpsCoordinates.partida);
-        prefConfig.putString(getString(R.string.destino), gpsCoordinates.destino);
-        TrackingService.getPointFromAddress(this, points, gpsCoordinates, geocoding);
-
+        initComponents();
         setContentView(R.layout.activity_navigation);
 
+        txtDistance = findViewById(R.id.txtDistance);
         fabFinish = findViewById(R.id.fabFinish);
         navigationView = findViewById(R.id.nvView);
         navigationView.onCreate(savedInstanceState);
 
         navigationView.initialize(this);
+
         tempoInicioViagem = System.currentTimeMillis();
 
         fabFinish.setVisibility(View.INVISIBLE);
@@ -161,16 +163,7 @@ public class TrackingActivity extends AppCompatActivity implements OnNavigationR
 
     @Override
     public void onNavigationReady(boolean isRunning) {
-        if(points.size() >= 2) {
-            fetchRoute(points.remove(0), points.remove(0));
-        }
-        else{
-            AlertDialog alertDialog = new AlertDialog.Builder(this).create();
-            alertDialog.setMessage(getString(R.string.dropoff_dialog_text));
-            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.error_address_navigation),
-                    (dialogInterface, in) -> finish());
-            alertDialog.show();
-        }
+        startNavigation(route.getRoutes().get(route.getRouteSelectedID()));
         //navigationView.findViewById(R.id.soundFab).setVisibility(View.GONE);
     }
 
@@ -198,9 +191,9 @@ public class TrackingActivity extends AppCompatActivity implements OnNavigationR
     public void saveData(){
         tempoFimViagem = System.currentTimeMillis();
         if(routeProgress != null){
-            prefConfig.putString(getString(R.string.distanceTraveled), formatDistance(totalDistanceTraveled));
+            prefConfig.putString(getString(R.string.distanceTraveled), TrackingService.formatDistance(totalDistanceTraveled));
         }
-        prefConfig.putString(getString(R.string.resumeTime), formatResumeTime(tempoFimViagem - tempoInicioViagem));
+        prefConfig.putString(getString(R.string.resumeTime), TrackingService.formatResumeTime(tempoFimViagem - tempoInicioViagem));
     }
 
     @Override
@@ -220,6 +213,7 @@ public class TrackingActivity extends AppCompatActivity implements OnNavigationR
 
     @Override
     public void onRerouteAlong(DirectionsRoute directionsRoute) {
+        Log.w("TrackingActivity", "Testando rerota");
     }
 
     @Override
@@ -229,50 +223,53 @@ public class TrackingActivity extends AppCompatActivity implements OnNavigationR
 
     @Override
     public void onArrival() {
+
         if (!dropoffDialogShown && !points.isEmpty()) {
-            showDropoffDialog();
+            //showDropoffDialog();
+            arrived = true;
+            rerouteAlong = false;
             dropoffDialogShown = true; // Accounts for multiple arrival events
             //Toast.makeText(this, "You have arrived! ", Toast.LENGTH_SHORT).show();
             //Toast.makeText(this, "Distância: " +formatDistance(routeProgress.distanceTraveled()), Toast.LENGTH_SHORT).show();
         }
     }
 
+    public void verifyFinishNavigation(Location location, double distanceTo){
+        float[] result = new float[1];
+        if(!rerouteAlong && distanceTo > 0) {
+            Location.distanceBetween(gpsCoordinates.destPoint.latitude(), gpsCoordinates.destPoint.longitude(),
+                    location.getLatitude(), location.getLongitude(), result);
+            if (result[0] > 50) {
+                fetchRoute(getLastKnownLocation(), gpsCoordinates.destPoint);
+                rerouteAlong = true;
+                arrived = true;
+            }
+        }
+    }
+
     @SuppressLint("RestrictedApi")
     @Override
     public void onProgressChange(Location location, RouteProgress routeProgress) {
-        lastKnownLocation = location;
+        double distanceTo = 0;
         this.routeProgress = routeProgress;
-        if(totalDistanceTraveled <= routeProgress.distanceTraveled()){
-            totalDistanceTraveled = routeProgress.distanceTraveled();
+        if(lastKnownLocation == null){
+            distanceTo = 0.0;
         }
         else{
-            totalDistanceTraveled += routeProgress.distanceTraveled();
+            distanceTo = location.distanceTo(lastKnownLocation);
         }
+        totalDistanceTraveled += distanceTo;
+        if(arrived){
+            verifyFinishNavigation(location, distanceTo);
+        }
+
+        lastKnownLocation = location;
+        navigationView.resumeCamera(location);
 
         if(routeProgress.distanceRemaining() < 50){
             fabFinish.setVisibility(View.VISIBLE);
         }
-        Toast.makeText(getApplicationContext(), "Distância: " +
-                formatDistance(totalDistanceTraveled), Toast.LENGTH_SHORT).show();
-    }
-
-    public String formatDistance(double distance){
-        DecimalFormat df = new DecimalFormat("#.00");
-        String sufix = " m";
-        if (distance >= 1000) {
-            distance = distance / 1000;
-            sufix = " km";
-        }
-        return df.format(distance)+sufix;
-    }
-
-    public String formatResumeTime(long resumeTime){
-        if(resumeTime >= 60000){
-            return (resumeTime/60000)+" min";
-        }
-        else{
-            return (resumeTime/1000)+" seg";
-        }
+        txtDistance.setText(TrackingService.formatDistance(totalDistanceTraveled));
     }
 
     private void startNavigation(DirectionsRoute directionsRoute) {
@@ -317,18 +314,32 @@ public class TrackingActivity extends AppCompatActivity implements OnNavigationR
 
     private NavigationViewOptions setupOptions(DirectionsRoute directionsRoute) {
         dropoffDialogShown = false;
+        arrived = false;
+        rerouteAlong = false;
 
         NavigationViewOptions.Builder options = NavigationViewOptions.builder();
         options.directionsRoute(directionsRoute)
                 .navigationListener(this)
                 .progressChangeListener(this)
-                .routeListener(this)
-                .shouldSimulateRoute(true);
+                .routeListener(this);
         return options.build();
     }
 
     private Point getLastKnownLocation() {
         return Point.fromLngLat(lastKnownLocation.getLongitude(), lastKnownLocation.getLatitude());
+    }
+
+    public void initComponents(){
+        navigationCanceled = false;
+        prefConfig = new PreferenceConfig(this);
+        presenter = new TrackingPresenter();
+        totalDistanceTraveled = 0.0;
+
+        prefConfig.putString(getString(R.string.partida), gpsCoordinates.partida);
+        prefConfig.putString(getString(R.string.destino), gpsCoordinates.destino);
+        TrackingService.getPointFromAddress(this, points, gpsCoordinates, geocoding);
+
+        route = (Route) getIntent().getParcelableExtra("route_obj");
     }
 }
 

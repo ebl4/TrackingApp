@@ -9,6 +9,7 @@ import com.mapbox.api.geocoding.v5.models.CarmenFeature;
 import com.mapbox.api.geocoding.v5.models.GeocodingResponse;
 import com.mapbox.geojson.Point;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 import retrofit2.Call;
@@ -34,9 +35,6 @@ public class TrackingService {
                     points.add(Point.fromLngLat(gpsCoordinates.destPoint.longitude(),
                             gpsCoordinates.destPoint.latitude()));
                     //Log.d(TAG, "onResponse: " + firstResultPoint.toString());
-                } else {
-                    // No result for your request were found.
-                    //Log.d(TAG, "onResponse: No result found");
                 }
             }
 
@@ -45,5 +43,57 @@ public class TrackingService {
                 t.printStackTrace();
             }
         });
+    }
+
+    public static String formatDistance(double distance){
+        DecimalFormat df = new DecimalFormat("#.00");
+        String sufix = " m";
+        if (distance >= 1000) {
+            distance = distance / 1000;
+            sufix = " km";
+        }
+        return distance >= 1 ? df.format(distance)+sufix : "0.00 m";
+    }
+
+    public static String formatResumeTime(long resumeTime){
+        return formatDuration(resumeTime/1000);
+    }
+
+    public static String formatDuration(double duration){
+        DecimalFormat df = new DecimalFormat("#.00");
+        if(duration >= 3600){
+            return df.format(duration/3600)+" hh";
+        }
+        else if (duration >= 60){
+            return df.format(duration/60)+" mm";
+        }
+        else{
+            return df.format(duration)+" ss";
+        }
+    }
+
+    public static String changeUnidadeTempo(String unidadeDeslocamento){
+        if(unidadeDeslocamento.equalsIgnoreCase("ss")){
+            unidadeDeslocamento = "seg";
+        }
+        else if(unidadeDeslocamento.equalsIgnoreCase("mm")){
+            unidadeDeslocamento = "min";
+        }
+        else if(unidadeDeslocamento.equalsIgnoreCase("hh")){
+            unidadeDeslocamento = "h";
+        }
+        return unidadeDeslocamento;
+    }
+
+    public static String formatName(String name, int option){
+        if(name.equalsIgnoreCase("")){
+            if(option == 1){
+                name = "Cliente não informado";
+            }
+            else{
+                name = "Destino não informado";
+            }
+        }
+        return name;
     }
 }

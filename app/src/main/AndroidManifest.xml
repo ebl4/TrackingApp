@@ -13,24 +13,30 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Tracking.View.RegisterEnterpriseActivity"></activity>
-        <activity android:name=".Reroute.activity.NavigationActivity"></activity>
-        <activity android:name=".Reroute.activity.RerouteActivity"></activity>
-        <activity android:name=".Tracking.View.TrackingActivity"
-            android:screenOrientation="portrait"
-            />
-        <activity android:name=".Tracking.View.ResumeTrafficView"></activity>
-        <activity android:name=".Tracking.View.RoutesActivity"
-            android:theme="@style/MainActivityTheme.NoActionBar"
-            android:label="Selecionar Rotas"/>
-        <activity android:name=".Tracking.View.VisitView">
+        <activity android:name=".Tracking.View.HomeView">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Tracking.View.CancelNavigationActivity"></activity>
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_maps_key" />
+
+        <activity android:name=".Tracking.View.RegisterEnterpriseActivity" />
+        <activity android:name=".Reroute.activity.NavigationActivity" />
+        <activity android:name=".Reroute.activity.RerouteActivity" />
+        <activity android:name=".Tracking.View.MapsActivity" />
+        <activity
+            android:name=".Tracking.View.TrackingActivity"
+            android:screenOrientation="portrait" />
+        <activity android:name=".Tracking.View.ResumeTrafficView" />
+        <activity
+            android:name=".Tracking.View.RoutesActivity"
+            android:label="Selecionar Rotas"
+            android:theme="@style/MainActivityTheme.NoActionBar" />
+        <activity android:name=".Tracking.View.CancelNavigationActivity" />
     </application>
 
 </manifest>

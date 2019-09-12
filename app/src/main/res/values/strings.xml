@@ -24,8 +24,10 @@
     <string name="alertInterrupted">Você está com uma viagem em andamento. Tem certeza que deseja finalizar?</string>
     <string name="alertSaveData">Você tem dados das últimas viagens não salvos. Deseja realizar a sincronização?</string>
     <string name="wazeNavigation">Você deseja iniciar a navegação com o Waze?</string>
+    <string name="mapsNavigation">Você deseja iniciar a navegação com o Google Maps?</string>
     <string name="ok">Ok</string>
     <string name="yes">Sim</string>
+    <string name="no">Não</string>
     <string name="defaultNavigation">Navegação padrão</string>
     <string name="navigationStatus">navigationStatus</string>
     <string name="viagemCancelada">Viagem Cancelada</string>
@@ -48,5 +50,6 @@
     <string name="minRouteDistance">minRouteDistance</string>
     <string name="minRouteTime">minRouteTime</string>
     <string name="minRouteAddress">minRouteAddress</string>
+    <string name="enterpriseUpdated">enterpriseUpdated</string>
     >
 </resources>

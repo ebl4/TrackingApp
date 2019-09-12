@@ -21,9 +21,9 @@ public class SecondTrackingRegister extends FirstTrackingRegister {
         this.setNomeEntrada1(register.getNomeEntrada1());
         this.setNomeEntrada2(register.getNomeEntrada2());
         this.setNomeEntrada3(register.getNomeEntrada3());
-        this.setAuxiliarEntrada1(register.getAuxiliarEntrada1());
-        this.setAuxiliarEntrada2(register.getAuxiliarEntrada2());
-        this.setAuxiliarEntrada3(register.getAuxiliarEntrada3());
+        this.setValorAuxiliarEntrada1(register.getValorAuxiliarEntrada1());
+        this.setValorAuxiliarEntrada2(register.getValorAuxiliarEntrada2());
+        this.seValorAuxiliarEntrada3(register.geValorAuxiliarEntrada3());
         this.setValorEntrada1(register.getValorEntrada1());
         this.setValorEntrada2(register.getValorEntrada2());
         this.setValorEntrada3(register.getValorEntrada3());

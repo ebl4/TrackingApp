@@ -1,7 +1,5 @@
 package com.example.mapboxapp.Tracking.View;
 
-import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -16,15 +14,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.example.mapboxapp.R;
+import com.example.mapboxapp.Tracking.Utils.PreferenceConfig;
+import com.example.mapboxapp.Tracking.Utils.PreferenceConfigInt;
+import com.example.mapboxapp.Tracking.Utils.TrackingService;
 import com.google.android.material.navigation.NavigationView;
 import com.mapbox.api.directions.v5.models.DirectionsResponse;
+import com.mapbox.api.directions.v5.models.DirectionsRoute;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.geojson.LineString;
@@ -48,13 +49,14 @@ import org.jetbrains.annotations.NotNull;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import timber.log.Timber;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
-import static com.example.mapboxapp.Tracking.View.VisitView.gpsCoordinates;
+import static com.example.mapboxapp.Tracking.View.Fragments.VisitFragment.gpsCoordinates;
 import static com.mapbox.core.constants.Constants.PRECISION_6;
 
 /* ===================================================================================
@@ -69,10 +71,13 @@ public class RoutesActivity extends AppCompatActivity implements NavigationView.
     private MapboxMap mapboxMap;
     private Style styleG;
     private Response<DirectionsResponse> routes;
-    private int routeSelectedID;
-    private boolean routeIsSet;
-
+    private DirectionsRoute minRoute;
     private MarkerViewManager markerViewManager;
+    private int routeSelectedID;
+    private boolean routeIsSet, routeFetched;
+
+    private PreferenceConfigInt prefs;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +87,7 @@ public class RoutesActivity extends AppCompatActivity implements NavigationView.
 
         navigationView = (NavigationView) findViewById(R.id.navView);
         navigationView.setNavigationItemSelectedListener(this);
+        prefs = new PreferenceConfig(this);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -184,6 +190,7 @@ public class RoutesActivity extends AppCompatActivity implements NavigationView.
                 this.mapboxMap = mapboxMap;
                 this.styleG = style;
                 this.routeIsSet = false;
+                routeFetched = false;
                 updateCameraPosition();
                 // ============================================================
             });
@@ -204,28 +211,35 @@ public class RoutesActivity extends AppCompatActivity implements NavigationView.
                 .origin(Point.fromLngLat(gpsCoordinates.longitude, gpsCoordinates.latitude))
                 .destination(gpsCoordinates.destPoint)
                 .alternatives(Boolean.TRUE)
+                .language(new Locale("pt-BR"))
                 .build()
                 .getRoute(new Callback<DirectionsResponse>() {
                     @Override
                     public void onResponse(@NotNull Call<DirectionsResponse> call,
                                            @NotNull Response<DirectionsResponse> response)
                     {
+                        DecimalFormat numberFormat = new DecimalFormat("#.00"); // work only with 2 decimal places
                         // For each route create a menu item with data of the route
                         for(int i = 0; i < Objects.requireNonNull(response.body()).routes().size(); ++i)
                         {
-                            double durationMin = (response.body().routes().get(i).duration() / 100); // route duration
-                            double distanceKM = (response.body().routes().get(i).distance() / 1000); // route distance
-
-                            DecimalFormat numberFormat = new DecimalFormat("#.00"); // work only with 2 decimal places
+                            if(!routeFetched){
+                                minRoute = response.body().routes().get(i);
+                                routeFetched = true;
+                            }
+                            if(response.body().routes().get(i).distance() < minRoute.distance()){
+                                minRoute = response.body().routes().get(i);
+                            }
+                            double durationMin = (response.body().routes().get(i).duration()); // route duration
+                            double distance = (response.body().routes().get(i).distance()); // route distance
 
                             // Menu title
                             menu.add(i, i, Menu.NONE,
-                                    "Rota " + (i+1) + ":  " + numberFormat.format(distanceKM) + " Km")
+                                    "Rota " + (i+1) + ":  " + TrackingService.formatDistance(distance))
                                     .setIcon(R.drawable.ic_navigation);
 
                             // Menu info with estimated time
                             menu.add(i, i, Menu.NONE,
-                                    "Tempo estimado: " + numberFormat.format(durationMin) + " Min")
+                                    "Tempo estimado: " + TrackingService.formatDuration(durationMin))
                                     .setIcon(R.drawable.ic_car).setEnabled(false);
 
                             // Menu with most specific place name for this route (DEVELOPING)
@@ -233,6 +247,10 @@ public class RoutesActivity extends AppCompatActivity implements NavigationView.
 
                         // Retrieve the directions routes from the API response
                         routes = response;
+                        prefs.putString(getString(R.string.minRouteDistance),  TrackingService.formatDistance(minRoute.distance()));
+                        prefs.putString(getString(R.string.minRouteTime),  TrackingService.formatDuration(minRoute.duration()));
+                        if(minRoute.legs() != null)
+                            prefs.putString(getString(R.string.minRouteAddress), Objects.requireNonNull(minRoute.legs()).get(0).summary());
                     }
 
                     @Override
@@ -287,16 +305,7 @@ public class RoutesActivity extends AppCompatActivity implements NavigationView.
     }
 
     public void startNavigation() {
-        AlertDialog.Builder ab = new AlertDialog.Builder(this);
-        ab.setTitle("Navegação");
-        ab.setMessage("Iniciar navegação com a rota selecionada?");
-        ab.setNegativeButton("Não", null);
-        ab.setPositiveButton("Sim", new Dialog.OnClickListener() {
-            public void onClick(DialogInterface arg0, int arg1) {
-                startNavigationActivity();
-            }
-        });
-        ab.create().show();
+        startNavigationActivity();
     }
 
     public void startNavigationActivity() {

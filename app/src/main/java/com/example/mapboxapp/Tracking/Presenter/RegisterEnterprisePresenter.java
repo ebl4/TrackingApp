@@ -3,6 +3,7 @@ package com.example.mapboxapp.Tracking.Presenter;
 import android.content.Context;
 import android.util.Log;
 import android.view.View;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.example.mapboxapp.R;
@@ -14,7 +15,10 @@ import com.example.mapboxapp.Tracking.Model.DadoEstado;
 import com.example.mapboxapp.Tracking.Model.Empresa;
 import com.example.mapboxapp.Tracking.Model.EstadoRegister;
 import com.example.mapboxapp.Tracking.Model.IdEstado;
+import com.example.mapboxapp.Tracking.Utils.PreferenceConfig;
+import com.example.mapboxapp.Tracking.Utils.PreferenceConfigInt;
 import com.example.mapboxapp.Tracking.View.RegisterEnterpriseActivity;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,10 +33,12 @@ public class RegisterEnterprisePresenter implements RegisterEnterprisePresenterI
     private Context context;
     private ArrayList<String[]> arrayEstado;
     private ArrayList<String[]> arrayCidade;
+    private PreferenceConfigInt prefs;
 
     public RegisterEnterprisePresenter(RegisterEnterpriseActivity view, Context context) {
         this.view = view;
         this.context = context;
+        prefs = new PreferenceConfig(context);
     }
 
     @Override
@@ -46,6 +52,8 @@ public class RegisterEnterprisePresenter implements RegisterEnterprisePresenterI
                 if(response.isSuccessful()){
                     //salvo com sucesso
                     Toast.makeText(context, "Empresa salva com sucesso", Toast.LENGTH_SHORT).show();
+                    //nova empresa a ser inserida no banco offline
+                    prefs.putBoolean(context.getString(R.string.enterpriseUpdated), true);
                 }
             }
 
@@ -54,6 +62,35 @@ public class RegisterEnterprisePresenter implements RegisterEnterprisePresenterI
                 Toast.makeText(context, "Falha ao salvar a empresa", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    @Override
+    public boolean checkTextFields(TextInputLayout... fields) {
+        boolean fieldsOk = false;
+        if(fields[0].getEditText().getText().toString().length() <= 3){
+            fields[0].setError("Por favor digite um nome válido");
+            fields[0].requestFocus();
+        }
+        else if(fields[1].getEditText().getText().toString().length() <= 3){
+            fields[1].setError("Por favor digite um cep válido");
+            fields[1].requestFocus();
+        }
+        else if(fields[2].getEditText().getText().toString().length() <= 3){
+            fields[2].setError("Por favor digite um logradouro válido");
+            fields[2].requestFocus();
+        }
+        else if(fields[3].getEditText().getText().toString().length() <= 3){
+            fields[3].setError("Por favor digite um bairro válido");
+            fields[3].requestFocus();
+        }
+        else if(fields[4].getEditText().getText().toString().length() <= 0){
+            fields[4].setError("Por favor digite um número válido");
+            fields[4].requestFocus();
+        }
+        else {
+            fieldsOk = true;
+        }
+        return fieldsOk;
     }
 
     @Override
@@ -92,14 +129,6 @@ public class RegisterEnterprisePresenter implements RegisterEnterprisePresenterI
     }
 
     @Override
-    public int returnEstadoCode(int position) {
-        if(arrayEstado != null && !arrayEstado.isEmpty()) {
-            return Integer.parseInt(arrayEstado.get(position)[0]);
-        }
-        return -1;
-    }
-
-    @Override
     public void setUpCidadeSpinner(int position) {
         Log.d("TesteCidadeClick2", arrayEstado.get(position)[1]);
         Services service = RetrofitConfig.getRetrofitInstance(RegisterEnterpriseActivity.RESOURCES_URL).create(Services.class);
@@ -132,11 +161,6 @@ public class RegisterEnterprisePresenter implements RegisterEnterprisePresenterI
                 view.showErrorRequest(context.getString(R.string.fail_load_cities));
             }
         });
-    }
-
-    @Override
-    public int returnCidadeCode(int codigo) {
-        return 0;
     }
 
     @Override

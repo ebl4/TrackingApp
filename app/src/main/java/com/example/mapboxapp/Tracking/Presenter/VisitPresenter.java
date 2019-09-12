@@ -1,11 +1,12 @@
 package com.example.mapboxapp.Tracking.Presenter;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
-import android.widget.Toast;
 
+import com.example.mapboxapp.R;
 import com.example.mapboxapp.Retrofit.RetrofitConfig;
 import com.example.mapboxapp.Retrofit.services.Services;
 import com.example.mapboxapp.Tracking.Database.TrackingContract;
@@ -15,16 +16,21 @@ import com.example.mapboxapp.Tracking.Model.SecondTrackingRegister;
 import com.example.mapboxapp.Tracking.Model.Motivo;
 import com.example.mapboxapp.Tracking.Model.OfflineNavigationData;
 import com.example.mapboxapp.Tracking.Model.TrackingRegister;
-import com.example.mapboxapp.Tracking.View.VisitView;
-import com.example.mapboxapp.Tracking.View.VisitViewInt;
+import com.example.mapboxapp.Tracking.Utils.PreferenceConfig;
+import com.example.mapboxapp.Tracking.Utils.PreferenceConfigInt;
+import com.example.mapboxapp.Tracking.View.Fragments.VisitFragment;
+import com.example.mapboxapp.Tracking.View.Fragments.VisitFragmentInt;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.example.mapboxapp.Tracking.Database.TrackingContract.CustomerEntry.COLUMN_NAME_CUSTOMER_ADDRESS;
+import static com.example.mapboxapp.Tracking.Database.TrackingContract.CustomerEntry.COLUMN_NAME_CUSTOMER_NAME;
 import static com.example.mapboxapp.Tracking.Database.TrackingContract.TrackingEntry.COLUMN_NAME_CLIENT_NAME;
 import static com.example.mapboxapp.Tracking.Database.TrackingContract.TrackingEntry.COLUMN_NAME_DESTINO;
 import static com.example.mapboxapp.Tracking.Database.TrackingContract.TrackingEntry.COLUMN_NAME_DISTANCIA;
@@ -37,17 +43,32 @@ import static com.example.mapboxapp.Tracking.Database.TrackingContract.TrackingE
 import static com.example.mapboxapp.Tracking.Presenter.ResumeTrafficPresenter.saveFirstDataChamado;
 import static com.example.mapboxapp.Tracking.Presenter.ResumeTrafficPresenter.saveMenorRotaChamado;
 
+/**
+ * Class that format infomation for visit activity and
+ * treat offline data related to tracking that has not saved yet
+ */
 public class VisitPresenter implements VisitPresenterInt {
 
+    /**
+     * Variables for local database and offline data
+     */
     List<OfflineNavigationData> offlineData;
     private SQLiteDatabase db;
-    private Context context;
-    private VisitViewInt view;
+    private TrackingDbHelper dbHelper;
+    private boolean updateCustomer;
+    PreferenceConfigInt prefs;
 
-    public VisitPresenter(Context context, VisitView view){
+    //Variables for view interface
+    private VisitFragmentInt view;
+    private Context context;
+
+    public VisitPresenter(Context context, VisitFragmentInt view){
         this.view = view;
         this.context = context;
-        db = new TrackingDbHelper(context).getReadableDatabase();
+        dbHelper = new TrackingDbHelper(context);
+        db = dbHelper.getReadableDatabase();
+        dbHelper.onCreate(db);
+        prefs = new PreferenceConfig(context);
     }
 
     @Override
@@ -128,7 +149,7 @@ public class VisitPresenter implements VisitPresenterInt {
 
             Motivo motivo = new Motivo();
             motivo.setMotivo(offlineItem.get_COLUMN_NAME_MOTIVO_VIAGEM());
-            Services service = RetrofitConfig.getRetrofitInstance(VisitView.CLIENTS_URL).create(Services.class);
+            Services service = RetrofitConfig.getRetrofitInstance(VisitFragment.CLIENTS_URL).create(Services.class);
 
             FirstTrackingRegister firstRegister =
                     this.formatFirstRegiter(1, "Origem (Cliente)", "Origem (Endereço)", "Destino (Cliente)",
@@ -171,6 +192,75 @@ public class VisitPresenter implements VisitPresenterInt {
         }
     }
 
+    @Override
+    public void retriveCustomerOfflineData(HashMap<String, String> clients, List<String> clientNames) {
+        String[] projection = {
+                BaseColumns._ID,
+                COLUMN_NAME_CUSTOMER_NAME,
+                COLUMN_NAME_CUSTOMER_ADDRESS
+        };
+        String sortOrder =
+                COLUMN_NAME_CUSTOMER_NAME + " DESC", clientName;
+        Cursor cursor = db.query(
+                TrackingContract.CustomerEntry.TABLE_NAME,
+                projection,
+                null,
+                null,
+                null,
+                null,
+                sortOrder);
+
+        while(cursor.moveToNext()) {
+            clientName = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_CUSTOMER_NAME));
+            clientNames.add(clientName);
+            clients.put(clientName, cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_CUSTOMER_ADDRESS)));
+        }
+        cursor.close();
+    }
+
+    @Override
+    public void updateOfflineCustomerData(HashMap<String, String> clients, List<String> clientNames, boolean synchronize){
+        ContentValues values = new ContentValues();
+        updateCustomer = prefs.getBoolean(context.getString(R.string.enterpriseUpdated));
+
+        if(!checkCustomerOfflineData() || synchronize || updateCustomer) {
+            //save offline data
+
+            //client data
+            for (int i = 0; i < clientNames.size() && i < 100; i++) {
+                values.put(TrackingContract.CustomerEntry.COLUMN_NAME_CUSTOMER_NAME, clientNames.get(i));
+                values.put(TrackingContract.CustomerEntry.COLUMN_NAME_CUSTOMER_ADDRESS, clients.get(clientNames.get(i)));
+                long newRowId = db.insert(TrackingContract.CustomerEntry.TABLE_NAME, null, values);
+            }
+            updateCustomer = false;
+            prefs.putBoolean(context.getString(R.string.enterpriseUpdated), updateCustomer);
+        }
+    }
+
+    @Override
+    public boolean checkCustomerOfflineData() {
+        boolean hasOfflineData = false;
+        String[] projection = {
+                BaseColumns._ID,
+                COLUMN_NAME_CUSTOMER_NAME,
+        };
+        String sortOrder =
+                COLUMN_NAME_CUSTOMER_NAME + " DESC";
+        Cursor cursor = db.query(
+                TrackingContract.CustomerEntry.TABLE_NAME,
+                projection,
+                null,
+                null,
+                null,
+                null,
+                sortOrder);
+        if(cursor.moveToNext()) {
+            hasOfflineData = true;
+        }
+        cursor.close();
+        return hasOfflineData;
+    }
+
     public SecondTrackingRegister formatMinRouteRegister(int option, String...params){
         SecondTrackingRegister register = new SecondTrackingRegister();
         FirstTrackingRegister firstTrackingRegister = this.formatFirstRegiter(option, params);
@@ -187,33 +277,33 @@ public class VisitPresenter implements VisitPresenterInt {
         switch (option){
             case 1:
                 register.setValorEntrada1(params[3]);
-                register.setAuxiliarEntrada1(params[3]);
+                register.setValorAuxiliarEntrada1(params[3]);
 
                 register.setValorEntrada2(params[3]);
-                register.setAuxiliarEntrada2(params[3]);
+                register.setValorAuxiliarEntrada2(params[3]);
 
                 register.setValorEntrada3(params[4]);
-                register.setAuxiliarEntrada3(params[4]);
+                register.seValorAuxiliarEntrada3(params[4]);
                 break;
             case 2:
                 register.setValorEntrada1(params[3]);
-                register.setAuxiliarEntrada1(params[3]);
+                register.setValorAuxiliarEntrada1(params[3]);
 
                 register.setValorEntrada2(params[4]);
-                register.setAuxiliarEntrada2(params[4]);
+                register.setValorAuxiliarEntrada2(params[4]);
 
                 register.setValorEntrada3(params[5]);
-                register.setAuxiliarEntrada3(params[5]);
+                register.seValorAuxiliarEntrada3(params[5]);
                 break;
             case 3:
                 register.setValorEntrada1(params[3]);
-                register.setAuxiliarEntrada1(params[3]);
+                register.setValorAuxiliarEntrada1(params[3]);
 
                 register.setValorEntrada2(params[4]);
-                register.setAuxiliarEntrada2(params[4]);
+                register.setValorAuxiliarEntrada2(params[4]);
 
                 register.setValorEntrada3(params[5]);
-                register.setAuxiliarEntrada3(params[5]);
+                register.seValorAuxiliarEntrada3(params[5]);
                 break;
         }
 

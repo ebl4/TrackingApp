@@ -20,12 +20,21 @@ import com.example.mapboxapp.Tracking.Presenter.RegisterEnterprisePresenter;
 import com.example.mapboxapp.Tracking.Presenter.RegisterEnterprisePresenterInt;
 import com.example.mapboxapp.Tracking.Utils.Util;
 import com.example.mapboxapp.Tracking.Utils.ZipCodeListener;
+import com.example.mapboxapp.Tracking.View.Fragments.VisitFragment;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.List;
 
+/**
+ * View that receives user data for a new enterprise
+ * and save the data in the Web Service
+ */
 public class RegisterEnterpriseActivity extends AppCompatActivity {
 
+    /**
+     * Fields for a new enterprise
+     * initiated with ButterKnife
+     */
     @BindView(R.id.inputName)
     TextInputLayout inputName;
     @BindView(R.id.inputLogradouro)
@@ -46,7 +55,7 @@ public class RegisterEnterpriseActivity extends AppCompatActivity {
     RegisterEnterprisePresenterInt presenter;
 
     public static final String VIACEP_URL = "https://viacep.com.br/ws/";
-    public static final String RESOURCES_URL = "https://ssm.sette.inf.br/SSM_GBS/RecusosServices/";
+    public static final String RESOURCES_URL = "https://desenv.sette.inf.br/SSM_GBS/RecusosServices/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +87,10 @@ public class RegisterEnterpriseActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Format fields related for a new enterprise and
+     * save them in the Web Service
+     */
     public void saveData(){
         String edtNome, edtLogradouro, edtNumero, edtBairro, edtCEP, edtEstado, edtCidade;
         Empresa empresa;
@@ -93,42 +106,17 @@ public class RegisterEnterpriseActivity extends AppCompatActivity {
         edtCidade = inputCidade.getSelectedItem().toString();
 
         clearFields();
-
-        if(edtNome.length() <= 3){
-            inputName.setError("Por favor digite um nome válido");
-            inputName.requestFocus();
-            return;
+        if(presenter.checkTextFields(inputName, inputCEP, inputLogradouro, inputBairro, inputNumero)){
+            empresa = presenter.formatEmpresa(edtNome, "", edtEstado, edtCidade, edtCEP,
+                    edtBairro, edtLogradouro, edtNumero, "");
+            presenter.makeRequest(empresa);
+            Intent intent = new Intent(this, HomeView.class);
+            intent.putExtra("cliente", edtNome);
+            intent.putExtra("endereco", edtLogradouro + " "
+                    + edtNumero + " " + edtBairro + " " + edtCidade);
+            startActivity(intent);
+            finish();
         }
-        else if(edtCEP.length() <= 3){
-            inputCEP.setError("Por favor digite um cep válido");
-            inputCEP.requestFocus();
-            return;
-        }
-        else if(edtLogradouro.length() <= 3){
-            inputLogradouro.setError("Por favor digite um logradouro válido");
-            inputLogradouro.requestFocus();
-            return;
-        }
-        else if(edtNumero.length() <= 0){
-            inputNumero.setError("Por favor digite um número válido");
-            inputNumero.requestFocus();
-            return;
-        }
-        else if(edtBairro.length() <= 3){
-            inputBairro.setError("Por favor digite um bairro válido");
-            inputBairro.requestFocus();
-            return;
-        }
-
-        empresa = presenter.formatEmpresa(edtNome, "", edtEstado, edtCidade, edtCEP,
-                edtBairro, edtLogradouro, edtNumero, "");
-        presenter.makeRequest(empresa);
-        Intent intent = new Intent(this, VisitView.class);
-        intent.putExtra("cliente", edtNome);
-        intent.putExtra("endereco", edtLogradouro + " "
-                + edtNumero + " " + edtBairro + " " + edtCidade);
-        startActivity(intent);
-        finish();
         //make request
     }
 
@@ -165,6 +153,10 @@ public class RegisterEnterpriseActivity extends AppCompatActivity {
         spnCidadeAdapter.notifyDataSetChanged();
     }
 
+    /**
+     * Clear all fields of the form
+     * setting error with null value
+     */
     public void clearFields(){
         inputName.setError(null);
         inputCEP.setError(null);

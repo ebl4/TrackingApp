@@ -6,9 +6,11 @@ import com.example.mapboxapp.Tracking.Model.Empresa;
 import com.example.mapboxapp.Tracking.Model.EstadoRegister;
 import com.example.mapboxapp.Tracking.Model.FirstTrackingRegister;
 import com.example.mapboxapp.Tracking.Model.IdEstado;
+import com.example.mapboxapp.Tracking.Model.ReportParameters;
 import com.example.mapboxapp.Tracking.Model.SecondTrackingRegister;
 import com.example.mapboxapp.Tracking.Model.Motivo;
 import com.example.mapboxapp.Tracking.Model.TrackingRegister;
+import com.example.mapboxapp.Tracking.Model.TrackingReport;
 import com.example.mapboxapp.Tracking.Model.TrackingResponseChamado;
 import com.example.mapboxapp.Tracking.Model.UserRegister;
 
@@ -34,6 +36,9 @@ public interface Services {
 
     @POST("AlterarEntradasDoChamado?login=gbsadmin")
     Call<TrackingResponseChamado> alterarChamadoMenorRota(@Body SecondTrackingRegister register);
+
+    @POST("ObterVisitasDoDeslocamento")
+    Call<TrackingReport> obterVisitasDoDeslocamento(@Body ReportParameters parameters);
 
     @POST("CriarEmpresaComEndereco")
     Call<Void> criarEmpresa(@Body Empresa empresa);

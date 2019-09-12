@@ -3,6 +3,7 @@ package com.example.mapboxapp.Tracking.Model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+
 public class FirstTrackingRegister {
     @SerializedName("idChamado")
     @Expose
@@ -13,27 +14,27 @@ public class FirstTrackingRegister {
     @SerializedName("valorEntrada1")
     @Expose
     private String valorEntrada1;
-    @SerializedName("auxiliarEntrada1")
+    @SerializedName("valorAuxiliarEntrada1")
     @Expose
-    private String auxiliarEntrada1;
+    private String valorAuxiliarEntrada1;
     @SerializedName("nomeEntrada2")
     @Expose
     private String nomeEntrada2;
     @SerializedName("valorEntrada2")
     @Expose
     private String valorEntrada2;
-    @SerializedName("auxiliarEntrada2")
+    @SerializedName("valorAuxiliarEntrada2")
     @Expose
-    private String auxiliarEntrada2;
+    private String valorAuxiliarEntrada2;
     @SerializedName("nomeEntrada3")
     @Expose
     private String nomeEntrada3;
     @SerializedName("valorEntrada3")
     @Expose
     private String valorEntrada3;
-    @SerializedName("auxiliarEntrada3")
+    @SerializedName("valorAuxiliarEntrada3")
     @Expose
-    private String auxiliarEntrada3;
+    private String valorAuxiliarEntrada3;
 
     public void setIdChamado(Integer idChamado) {
         this.idChamado = idChamado;
@@ -47,8 +48,8 @@ public class FirstTrackingRegister {
         this.valorEntrada1 = valorEntrada1;
     }
 
-    public void setAuxiliarEntrada1(String auxiliarEntrada1) {
-        this.auxiliarEntrada1 = auxiliarEntrada1;
+    public void setValorAuxiliarEntrada1(String valorAuxiliarEntrada1) {
+        this.valorAuxiliarEntrada1 = valorAuxiliarEntrada1;
     }
 
     public void setNomeEntrada2(String nomeEntrada2) {
@@ -59,8 +60,8 @@ public class FirstTrackingRegister {
         this.valorEntrada2 = valorEntrada2;
     }
 
-    public void setAuxiliarEntrada2(String auxiliarEntrada2) {
-        this.auxiliarEntrada2 = auxiliarEntrada2;
+    public void setValorAuxiliarEntrada2(String valorAuxiliarEntrada2) {
+        this.valorAuxiliarEntrada2 = valorAuxiliarEntrada2;
     }
 
     public void setNomeEntrada3(String nomeEntrada3) {
@@ -71,8 +72,8 @@ public class FirstTrackingRegister {
         this.valorEntrada3 = valorEntrada3;
     }
 
-    public void setAuxiliarEntrada3(String auxiliarEntrada3) {
-        this.auxiliarEntrada3 = auxiliarEntrada3;
+    public void seValorAuxiliarEntrada3(String valorAuxiliarEntrada3) {
+        this.valorAuxiliarEntrada3 = valorAuxiliarEntrada3;
     }
 
     public Integer getIdChamado() {
@@ -87,8 +88,8 @@ public class FirstTrackingRegister {
         return valorEntrada1;
     }
 
-    public String getAuxiliarEntrada1() {
-        return auxiliarEntrada1;
+    public String getValorAuxiliarEntrada1() {
+        return valorAuxiliarEntrada1;
     }
 
     public String getNomeEntrada2() {
@@ -99,8 +100,8 @@ public class FirstTrackingRegister {
         return valorEntrada2;
     }
 
-    public String getAuxiliarEntrada2() {
-        return auxiliarEntrada2;
+    public String getValorAuxiliarEntrada2() {
+        return valorAuxiliarEntrada2;
     }
 
     public String getNomeEntrada3() {
@@ -111,7 +112,7 @@ public class FirstTrackingRegister {
         return valorEntrada3;
     }
 
-    public String getAuxiliarEntrada3() {
-        return auxiliarEntrada3;
+    public String geValorAuxiliarEntrada3() {
+        return valorAuxiliarEntrada3;
     }
 }

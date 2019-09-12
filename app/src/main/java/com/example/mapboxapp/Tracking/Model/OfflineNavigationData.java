@@ -2,15 +2,15 @@ package com.example.mapboxapp.Tracking.Model;
 
 public class OfflineNavigationData {
     private String _ID,
-            _COLUMN_NAME_CLIENT_NAME,
-            _COLUMN_NAME_ORIGEM,
-            _COLUMN_NAME_DESTINO,
-            _COLUMN_NAME_DISTANCIA,
-            _COLUMN_NAME_TEMPO_VIAGEM,
-            _COLUMN_NAME_MOTIVO_VIAGEM,
-            _COLUMN_NAME_MENOR_ROTA_ENDERECO,
-            _COLUMN_NAME_MENOR_ROTA_DISTANCIA,
-            _COLUMN_NAME_MENOR_ROTA_TEMPO;
+    _COLUMN_NAME_CLIENT_NAME,
+    _COLUMN_NAME_ORIGEM,
+    _COLUMN_NAME_DESTINO,
+    _COLUMN_NAME_DISTANCIA,
+    _COLUMN_NAME_TEMPO_VIAGEM,
+    _COLUMN_NAME_MOTIVO_VIAGEM,
+    _COLUMN_NAME_MENOR_ROTA_ENDERECO,
+    _COLUMN_NAME_MENOR_ROTA_DISTANCIA,
+    _COLUMN_NAME_MENOR_ROTA_TEMPO;
 
     public OfflineNavigationData(String _ID,
                                  String COLUMN_NAME_CLIENT_NAME,

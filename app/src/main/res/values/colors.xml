@@ -23,6 +23,6 @@
     <color name="mediumGray">#afbab3</color>
     <color name="dataColor">#696969</color>
     <color name="mapboxWhite">#FFFFFF</color>
-    <color name="colorPrimaryButton">#126e40</color>
+    <color name="colorPrimaryButton">#126E40</color>
     <color name="black_semi_transparent">#B2000000</color>
 </resources>
